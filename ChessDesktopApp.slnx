@@ -1,0 +1,22 @@
+<Solution>
+  <Configurations>
+    <Platform Name="ARM64" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="ChessDesktopApp/ChessDesktopApp (Package)/ChessDesktopApp (Package).wapproj" Type="c7167f0d-bc9f-4e6e-afe1-012c56b48db5">
+    <Deploy />
+  </Project>
+  <Project Path="ChessDesktopApp/ChessDesktopApp/ChessDesktopApp.csproj">
+    <Platform Solution="*|ARM64" Project="ARM64" />
+    <Platform Solution="*|x64" Project="x64" />
+    <Platform Solution="*|x86" Project="x86" />
+  </Project>
+  <Project Path="ChessDesktopApp/Chess.Core/Chess.Core.csproj" />
+  <Project Path="ChessDesktopApp/Chess.Core.Tests/Chess.Core.Tests.csproj" />
+  <Project Path="ChessDesktopApp/Chess.App.Tests/Chess.App.Tests.csproj">
+    <Platform Solution="*|ARM64" Project="ARM64" />
+    <Platform Solution="*|x64" Project="x64" />
+    <Platform Solution="*|x86" Project="x86" />
+  </Project>
+</Solution>

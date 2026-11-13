@@ -1,0 +1,32 @@
+# Local tools and editor state
+.codex/
+.agents/
+.claude/
+.vs/
+.idea/
+.vscode/
+**/*.user
+**/*.suo
+**/*.cache
+
+# Build, test and distribution outputs
+**/bin/
+**/obj/
+**/AppPackages/
+artifacts/
+dist/
+**/TestResults/
+*.log
+
+# Local secrets and signing material
+.env
+.env.*
+*.pfx
+*.p12
+*.cer
+*.key
+
+# Engine binaries are downloaded separately
+**/Stockfish/*.exe
+**/Stockfish/*.dll
+**/Stockfish/*.nnue

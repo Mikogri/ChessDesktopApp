@@ -1,0 +1,3192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window
+    x:Class="ChessDesktopApp.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:vm="using:ChessDesktopApp.ViewModels" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="Fluent Chess">
+    <NavigationView
+        x:Name="ShellNavigation"
+        PaneDisplayMode="Auto"
+        IsBackButtonVisible="Collapsed"
+        IsSettingsVisible="False"
+        IsPaneToggleButtonVisible="True"
+        OpenPaneLength="238"
+        CompactPaneLength="48"
+        SelectionChanged="ShellNavigation_SelectionChanged">
+        <NavigationView.MenuItems>
+            <NavigationViewItem
+                x:Name="GameNavItem"
+                Content="Gra z botem"
+                Tag="game"
+                IsSelected="True">
+                <NavigationViewItem.Icon>
+                    <FontIcon
+                        Glyph="" />
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
+            <NavigationViewItem
+                x:Name="MatchNavItem"
+                Content="Pojedynek silników"
+                Tag="match">
+                <NavigationViewItem.Icon>
+                    <FontIcon
+                        Glyph="" />
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
+            <NavigationViewItem
+                x:Name="TournamentNavItem"
+                Content="Turnieje silników"
+                Tag="tournaments">
+                <NavigationViewItem.Icon>
+                    <FontIcon
+                        Glyph="" />
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
+            <NavigationViewItem
+                x:Name="GamesNavItem"
+                Content="Zapisane partie silników"
+                Tag="games">
+                <NavigationViewItem.Icon>
+                    <FontIcon
+                        Glyph="" />
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
+            <NavigationViewItem
+                x:Name="HistoryNavItem"
+                Content="Historia turniejów"
+                Tag="history">
+                <NavigationViewItem.Icon>
+                    <FontIcon
+                        Glyph="" />
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
+            <NavigationViewItem
+                x:Name="EnginesNavItem"
+                Content="Silniki / konfiguracja"
+                Tag="engines">
+                <NavigationViewItem.Icon>
+                    <FontIcon
+                        Glyph="" />
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
+            <NavigationViewItem
+                x:Name="SettingsNavItem"
+                Content="Ustawienia"
+                Tag="settings">
+                <NavigationViewItem.Icon>
+                    <FontIcon
+                        Glyph="" />
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
+        </NavigationView.MenuItems>
+        <Grid>
+            <Grid
+                x:Name="RootLayout"
+                Padding="0"
+                ColumnSpacing="0"
+                SizeChanged="RootLayout_SizeChanged">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition
+                        Width="Auto" />
+                    <ColumnDefinition
+                        Width="*" />
+                </Grid.ColumnDefinitions>
+                <!-- Kolumna gry -->
+                <Grid
+                    x:Name="GameColumn"
+                    Grid.Column="0"
+                    HorizontalAlignment="Left"
+                    Margin="24">
+                    <Grid.RowDefinitions>
+                        <RowDefinition
+                            Height="Auto" />
+                        <RowDefinition
+                            Height="Auto" />
+                        <RowDefinition
+                            Height="*" />
+                        <RowDefinition
+                            Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Border
+                        Margin="4,0,0,16"
+                        Padding="0"
+                        CornerRadius="0"
+                        BorderThickness="0"
+                        Background="Transparent">
+                        <Grid
+                            ColumnSpacing="16">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition
+                                    Width="*" />
+                                <ColumnDefinition
+                                    Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel
+                                Grid.Column="0">
+                                <StackPanel
+                                    Orientation="Horizontal">
+                                    <TextBlock
+                                        Text="{Binding TurnText}"
+                                        FontSize="22"
+                                        FontWeight="SemiBold" />
+                                    <ProgressRing
+                                        IsActive="{Binding IsBusy}"
+                                        Width="12"
+                                        Height="12"
+                                        Margin="12,0,0,-4" />
+                                </StackPanel>
+                                <TextBlock
+                                    Text="{Binding StatusText}"
+                                    Opacity="0.72"
+                                    FontSize="14"
+                                    Margin="0,3" />
+                            </StackPanel>
+                            <StackPanel
+                                Grid.Column="1"
+                                Orientation="Horizontal"
+                                Spacing="12"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Center">
+                                <Border
+                                    BorderThickness="1"
+                                    CornerRadius="10"
+                                    Padding="0,4">
+                                    <StackPanel
+                                        Orientation="Horizontal"
+                                        Spacing="7">
+                                        <Ellipse
+                                            x:Name="GameStatusIndicator"
+                                            Width="11"
+                                            Height="11"
+                                            Fill="{Binding GameStateBrush}"
+                                            RenderTransformOrigin="0.5,0.5">
+                                            <Ellipse.RenderTransform>
+                                                <CompositeTransform />
+                                            </Ellipse.RenderTransform>
+                                        </Ellipse>
+                                        <TextBlock
+                                            Text="{Binding GameStateText}"
+                                            FontSize="14"
+                                            FontWeight="SemiBold" />
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                    <Grid
+                        Grid.Row="1"
+                        Margin="6,0,6,8"
+                        ColumnSpacing="10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition
+                                Width="38" />
+                            <ColumnDefinition
+                                Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border
+                            Style="{StaticResource ChessPlayerAvatarStyle}">
+                            <FontIcon
+                                Glyph=""
+                                FontSize="18"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center" />
+                        </Border>
+                        <StackPanel
+                            Grid.Column="1"
+                            VerticalAlignment="Center">
+                            <TextBlock
+                                Text="{Binding TopPlayerName}"
+                                FontWeight="SemiBold" />
+                            <StackPanel
+                                Orientation="Horizontal"
+                                Spacing="8">
+                                <TextBlock
+                                    Text="Zdobyte:"
+                                    FontSize="11"
+                                    Opacity="0.58"
+                                    VerticalAlignment="Center" />
+                                <TextBlock
+                                    Text="{Binding TopCapturedPieces}"
+                                    FontFamily="Segoe UI Symbol"
+                                    FontSize="16"
+                                    Foreground="{StaticResource ChessPrimaryTextBrush}"
+                                    Opacity="0.92" />
+                                <TextBlock
+                                    Text="{Binding TopAdvantageText}"
+                                    FontSize="12"
+                                    FontWeight="SemiBold"
+                                    VerticalAlignment="Center" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                    <Grid
+                        Grid.Row="2"
+                        ColumnSpacing="4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition
+                                Width="8" />
+                            <ColumnDefinition
+                                Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border
+                            x:Name="AdvantageTrack"
+                            Grid.Column="0"
+                            Width="3"
+                            Margin="0,8,-2,8"
+                            CornerRadius="1.5"
+                            Background="{StaticResource ChessAdvantageTrackBrush}"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Stretch"
+                            SizeChanged="AdvantageTrack_SizeChanged">
+                            <Grid>
+                                <Border
+                                    x:Name="AdvantageFill"
+                                    Background="{StaticResource ChessPurpleBrush}"
+                                    VerticalAlignment="Top"
+                                    CornerRadius="1.5" />
+                                <Border
+                                    x:Name="AdvantageWhiteFill"
+                                    Background="White"
+                                    VerticalAlignment="Bottom"
+                                    CornerRadius="1.5" />
+                                <Border
+                                    Height="1"
+                                    Background="{StaticResource ChessAdvantageCenterBrush}"
+                                    VerticalAlignment="Center" />
+                            </Grid>
+                        </Border>
+                        <Viewbox
+                            Grid.Column="1"
+                            Stretch="Uniform"
+                            StretchDirection="Both"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch">
+                            <Grid
+                                Width="650"
+                                Height="650">
+                                <Border
+                                    CornerRadius="8"
+                                    BorderThickness="1"
+                                    Padding="4">
+                                    <ItemsRepeater
+                                        x:Name="BoardRepeater"
+                                        ItemsSource="{Binding Squares}"
+                                        Width="640"
+                                        Height="640">
+                                        <ItemsRepeater.Layout>
+                                            <UniformGridLayout
+                                                MinItemWidth="80"
+                                                MinItemHeight="80"
+                                                MaximumRowsOrColumns="8"
+                                                Orientation="Horizontal" />
+                                        </ItemsRepeater.Layout>
+                                        <ItemsRepeater.ItemTemplate>
+                                            <DataTemplate
+                                                x:DataType="vm:BoardSquareViewModel">
+                                                <Button
+                                                    Width="80"
+                                                    Height="80"
+                                                    Padding="0"
+                                                    Margin="0"
+                                                    Style="{StaticResource BoardSquareButtonStyle}"
+                                                    CornerRadius="0"
+                                                    BorderThickness="0"
+                                                    Background="{x:Bind Background, Mode=OneWay}"
+                                                    Tag="{x:Bind SquareName}"
+                                                    AutomationProperties.Name="{x:Bind SquareName}"
+                                                    CanDrag="True"
+                                                    AllowDrop="True"
+                                                    Click="Square_Click"
+                                                    DragStarting="Square_DragStarting"
+                                                    DragOver="Square_DragOver"
+                                                    Drop="Square_Drop">
+                                                    <Grid
+                                                        Width="80"
+                                                        Height="80">
+                                                        <Border
+                                                            Margin="7"
+                                                            BorderThickness="4"
+                                                            BorderBrush="{StaticResource ChessSecondaryTextBrush}"
+                                                            CornerRadius="38"
+                                                            Opacity="{x:Bind CaptureHintOpacity, Mode=OneWay}" />
+                                                        <TextBlock
+                                                            Text="{x:Bind PieceGlyph, Mode=OneWay}"
+                                                            Tag="PieceGlyph"
+                                                            Foreground="{x:Bind PieceBrush, Mode=OneWay}"
+                                                            FontFamily="Segoe UI Symbol"
+                                                            FontSize="56"
+                                                            HorizontalAlignment="Center"
+                                                            VerticalAlignment="Center" />
+                                                        <Ellipse
+                                                            Width="14"
+                                                            Height="14"
+                                                            Fill="{StaticResource ChessWarningBrush}"
+                                                            Stroke="{StaticResource ChessScrimBrush}"
+                                                            StrokeThickness="1"
+                                                            Opacity="{x:Bind MoveHintOpacity, Mode=OneWay}"
+                                                            HorizontalAlignment="Center"
+                                                            VerticalAlignment="Center" />
+                                                        <TextBlock
+                                                            Text="{x:Bind RankLabel, Mode=OneWay}"
+                                                            FontSize="12"
+                                                            FontWeight="Bold"
+                                                            Foreground="White"
+                                                            Opacity="0.95"
+                                                            Margin="5,3,0,0"
+                                                            HorizontalAlignment="Left"
+                                                            VerticalAlignment="Top" />
+                                                        <TextBlock
+                                                            Text="{x:Bind FileLabel, Mode=OneWay}"
+                                                            FontSize="12"
+                                                            FontWeight="Bold"
+                                                            Foreground="White"
+                                                            Opacity="0.95"
+                                                            Margin="0,0,5,3"
+                                                            HorizontalAlignment="Right"
+                                                            VerticalAlignment="Bottom" />
+                                                    </Grid>
+                                                </Button>
+                                            </DataTemplate>
+                                        </ItemsRepeater.ItemTemplate>
+                                    </ItemsRepeater>
+                                </Border>
+                                <Canvas
+                                    x:Name="AnimationLayer"
+                                    Width="640"
+                                    Height="640"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    IsHitTestVisible="False" />
+                            </Grid>
+                        </Viewbox>
+                    </Grid>
+                    <Grid
+                        Grid.Row="3"
+                        Margin="6,8,6,0"
+                        ColumnSpacing="10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition
+                                Width="38" />
+                            <ColumnDefinition
+                                Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border
+                            Style="{StaticResource ChessPlayerAvatarStyle}">
+                            <FontIcon
+                                Glyph=""
+                                FontSize="18"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center" />
+                        </Border>
+                        <StackPanel
+                            Grid.Column="1"
+                            VerticalAlignment="Center">
+                            <TextBlock
+                                Text="{Binding BottomPlayerName}"
+                                FontWeight="SemiBold" />
+                            <StackPanel
+                                Orientation="Horizontal"
+                                Spacing="8">
+                                <TextBlock
+                                    Text="Zdobyte:"
+                                    FontSize="11"
+                                    Opacity="0.58"
+                                    VerticalAlignment="Center" />
+                                <TextBlock
+                                    Text="{Binding BottomCapturedPieces}"
+                                    FontFamily="Segoe UI Symbol"
+                                    FontSize="16"
+                                    Foreground="{StaticResource ChessPrimaryTextBrush}"
+                                    Opacity="0.95" />
+                                <TextBlock
+                                    Text="{Binding BottomAdvantageText}"
+                                    FontSize="12"
+                                    FontWeight="SemiBold"
+                                    VerticalAlignment="Center" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+                <!-- Kolumna sterowania i dziennika -->
+                <Border
+                    Grid.Column="1"
+                    BorderThickness="1,1,0,0"
+                    CornerRadius="12,0,0,0"
+                    Padding="0"
+                    HorizontalAlignment="Stretch"
+                    Background="{StaticResource ChessPanelBrush}"
+                    BorderBrush="{StaticResource ChessBorderBrush}"
+                    RequestedTheme="Dark">
+                    <Grid
+                        RowSpacing="14">
+                        <Grid.RowDefinitions>
+                            <RowDefinition
+                                Height="Auto" />
+                            <RowDefinition
+                                Height="Auto" />
+                            <RowDefinition
+                                Height="Auto" />
+                            <RowDefinition
+                                Height="*" />
+                        </Grid.RowDefinitions>
+                        <StackPanel
+                            Spacing="10"
+                            Margin="20,20,20,0">
+                            <TextBlock
+                                Text="Ustawienia partii"
+                                FontSize="20"
+                                FontWeight="SemiBold" />
+                            <ComboBox
+                                Header="Silnik przeciwnika"
+                                ItemsSource="{Binding AvailableEngines}"
+                                DisplayMemberPath="Name"
+                                SelectedItem="{Binding SelectedEngine, Mode=TwoWay}"
+                                IsEnabled="{Binding CanChangeEngine}"
+                                HorizontalAlignment="Stretch" />
+                            <Grid
+                                ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition
+                                        Width="*" />
+                                    <ColumnDefinition
+                                        Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel
+                                    Spacing="5">
+                                    <TextBlock
+                                        Text="Kolor"
+                                        FontSize="12"
+                                        Opacity="0.7" />
+                                    <ComboBox
+                                        ItemsSource="{Binding ColorChoices}"
+                                        SelectedItem="{Binding SelectedColorChoice, Mode=TwoWay}"
+                                        DisplayMemberPath="Name"
+                                        HorizontalAlignment="Stretch"
+                                        IsEnabled="{Binding CanChangeEngine}" />
+                                </StackPanel>
+                                <StackPanel
+                                    Grid.Column="1"
+                                    Spacing="5">
+                                    <TextBlock
+                                        Text="Poziom"
+                                        FontSize="12"
+                                        Opacity="0.7" />
+                                    <TextBlock
+                                        Text="{Binding SelectedDifficulty.Name}"
+                                        FontWeight="SemiBold"
+                                        Margin="0,8,0,0" />
+                                </StackPanel>
+                            </Grid>
+                            <Grid>
+                                <TextBlock
+                                    Text="Siła silnika"
+                                    FontSize="12"
+                                    Opacity="0.7" />
+                                <TextBlock
+                                    Text="{Binding DifficultyEloText}"
+                                    FontSize="12"
+                                    FontWeight="SemiBold"
+                                    HorizontalAlignment="Right" />
+                            </Grid>
+                            <Slider
+                                Minimum="0"
+                                Maximum="{Binding DifficultyMaximum}"
+                                Value="{Binding SelectedDifficultyIndex, Mode=TwoWay}"
+                                IsEnabled="{Binding CanChangeDifficulty}"
+                                StepFrequency="1"
+                                TickFrequency="1"
+                                SnapsTo="StepValues" />
+                            <TextBlock
+                                Text="{Binding SelectedDifficulty.Description}"
+                                TextWrapping="Wrap"
+                                FontSize="11"
+                                Opacity="0.65" />
+                            <TextBlock
+                                Text="Promocję wybierzesz w oknie, które pojawi się po wejściu pionka na ostatnią linię."
+                                TextWrapping="Wrap"
+                                FontSize="11"
+                                Opacity="0.65" />
+                            <Grid
+                                ColumnSpacing="10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition
+                                        Width="2*" />
+                                    <ColumnDefinition
+                                        Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Button
+                                    Content="{Binding StartButtonText}"
+                                    Command="{Binding StartNewGameCommand}"
+                                    HorizontalAlignment="Stretch"
+                                    Style="{StaticResource AccentButtonStyle}" />
+                                <Button
+                                    Grid.Column="1"
+                                    Content="Poddaj partię"
+                                    Command="{Binding ResignCommand}"
+                                    IsEnabled="{Binding CanResign}"
+                                    HorizontalAlignment="Stretch"
+                                    Style="{StaticResource ChessDangerButtonStyle}" />
+                            </Grid>
+                        </StackPanel>
+                        <InfoBar
+                            Grid.Row="1"
+                            Margin="20,0"
+                            IsOpen="{Binding HasError}"
+                            Severity="Error"
+                            IsClosable="False"
+                            Title="Silnik jest niedostępny"
+                            Message="{Binding ErrorText}" />
+                        <Grid
+                            Grid.Row="2"
+                            Margin="20,0"
+                            Padding="0,4"
+                            ColumnSpacing="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition
+                                    Width="Auto" />
+                                <ColumnDefinition
+                                    Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <ProgressRing
+                                IsActive="{Binding IsGameThinking}"
+                                Visibility="{Binding GameThinkingVisibility}"
+                                Width="16"
+                                Height="16"
+                                VerticalAlignment="Center" />
+                            <TextBlock
+                                Grid.Column="1"
+                                Text="{Binding GameActivityText}"
+                                FontSize="13"
+                                FontWeight="SemiBold"
+                                Foreground="{Binding GameStateBrush}"
+                                VerticalAlignment="Center"
+                                TextWrapping="Wrap" />
+                        </Grid>
+                        <Border
+                            Grid.Row="3"
+                            Margin="0,2,0,0"
+                            BorderThickness="0,1,0,0"
+                            BorderBrush="{StaticResource ChessBorderBrush}"
+                            Background="{StaticResource ChessPanelBrush}">
+                            <Grid
+                                Padding="20,12,20,0"
+                                Background="{StaticResource ChessPanelBrush}">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition
+                                        Height="Auto" />
+                                    <RowDefinition
+                                        Height="Auto" />
+                                    <RowDefinition
+                                        Height="*" />
+                                    <RowDefinition
+                                        Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <TextBlock
+                                    Text="Dziennik ruchów"
+                                    FontSize="16"
+                                    FontWeight="SemiBold"
+                                    Margin="0,0,0,8" />
+                                <Grid
+                                    Grid.Row="1"
+                                    Padding="10,7"
+                                    ColumnSpacing="8"
+                                    Background="Transparent">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition
+                                            Width="36" />
+                                        <ColumnDefinition
+                                            Width="*" />
+                                        <ColumnDefinition
+                                            Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock
+                                        Text="#" />
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Text="Białe" />
+                                    <TextBlock
+                                        Grid.Column="2"
+                                        Text="Czarne" />
+                                </Grid>
+                                <ListView
+                                    Grid.Row="2"
+                                    ItemsSource="{Binding MoveLog}"
+                                    SelectionMode="Single"
+                                    SelectionChanged="GameMoveLog_SelectionChanged"
+                                    HorizontalContentAlignment="Stretch"
+                                    Background="{StaticResource ChessPanelBrush}"
+                                    CornerRadius="0">
+                                    <ListView.ItemTemplate>
+                                        <DataTemplate
+                                            x:DataType="vm:MoveLogEntryViewModel">
+                                            <Grid
+                                                Padding="6,4"
+                                                ColumnSpacing="8">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition
+                                                        Width="36" />
+                                                    <ColumnDefinition
+                                                        Width="*" />
+                                                    <ColumnDefinition
+                                                        Width="*" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock
+                                                    Text="{x:Bind Number}"
+                                                    Opacity="0.6" />
+                                                <TextBlock
+                                                    Grid.Column="1"
+                                                    Text="{x:Bind WhiteMove}"
+                                                    FontFamily="Cascadia Mono" />
+                                                <TextBlock
+                                                    Grid.Column="2"
+                                                    Text="{x:Bind BlackMove}"
+                                                    FontFamily="Cascadia Mono" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ListView.ItemTemplate>
+                                </ListView>
+                                <Grid
+                                    Grid.Row="3"
+                                    Padding="0,8,0,10"
+                                    ColumnSpacing="10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition
+                                            Width="Auto" />
+                                        <ColumnDefinition
+                                            Width="*" />
+                                        <ColumnDefinition
+                                            Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <Button
+                                        Width="36"
+                                        Height="32"
+                                        Padding="0"
+                                        Click="GameHistoryPrevious_Click"
+                                        IsEnabled="{Binding CanBrowsePrevious}"
+                                        ToolTipService.ToolTip="Poprzedni ruch"
+                                        AutomationProperties.Name="Poprzedni ruch">
+                                        <FontIcon
+                                            Glyph=""
+                                            FontSize="13" />
+                                    </Button>
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Text="{Binding HistoryPositionText}"
+                                        FontSize="12"
+                                        Opacity="0.72"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center" />
+                                    <Button
+                                        Grid.Column="2"
+                                        Width="36"
+                                        Height="32"
+                                        Padding="0"
+                                        Click="GameHistoryNext_Click"
+                                        IsEnabled="{Binding CanBrowseNext}"
+                                        ToolTipService.ToolTip="Następny ruch"
+                                        AutomationProperties.Name="Następny ruch">
+                                        <FontIcon
+                                            Glyph=""
+                                            FontSize="13" />
+                                    </Button>
+                                </Grid>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </Border>
+            </Grid>
+            <!-- Pojedynek silników / obserwowanie meczu -->
+            <Grid
+                x:Name="EngineMatchView"
+                Visibility="Collapsed"
+                DataContext="{x:Bind Hub}"
+                SizeChanged="EngineMatchView_SizeChanged">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition
+                        Width="Auto" />
+                    <ColumnDefinition
+                        Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid
+                    x:Name="EngineMatchColumn"
+                    Grid.Column="0"
+                    HorizontalAlignment="Left"
+                    Margin="24">
+                    <Grid.RowDefinitions>
+                        <RowDefinition
+                            Height="Auto" />
+                        <RowDefinition
+                            Height="Auto" />
+                        <RowDefinition
+                            Height="*" />
+                        <RowDefinition
+                            Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Border
+                        Margin="4,0,0,16"
+                        Padding="0"
+                        CornerRadius="0"
+                        Background="Transparent"
+                        BorderThickness="0">
+                        <Grid
+                            ColumnSpacing="16">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition
+                                    Width="*" />
+                                <ColumnDefinition
+                                    Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel
+                                Grid.Column="0">
+                                <StackPanel
+                                    Orientation="Horizontal">
+                                    <TextBlock
+                                        Text="Pojedynek silników"
+                                        FontSize="22"
+                                        FontWeight="SemiBold" />
+                                    <ProgressRing
+                                        IsActive="{Binding IsBusy}"
+                                        Width="12"
+                                        Height="12"
+                                        Margin="12,0,0,-4" />
+                                </StackPanel>
+                                <TextBlock
+                                    Text="{Binding MatchStatus}"
+                                    Opacity="0.72"
+                                    FontSize="14"
+                                    Margin="0,3" />
+                            </StackPanel>
+                            <StackPanel
+                                Grid.Column="1"
+                                Orientation="Horizontal"
+                                Spacing="12"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Center">
+                                <Border
+                                    BorderThickness="1"
+                                    CornerRadius="10"
+                                    Padding="0,4">
+                                    <StackPanel
+                                        Orientation="Horizontal"
+                                        Spacing="7">
+                                        <Ellipse
+                                            x:Name="MatchStatusIndicator"
+                                            Width="11"
+                                            Height="11"
+                                            Fill="{Binding MatchStateBrush}"
+                                            RenderTransformOrigin="0.5,0.5">
+                                            <Ellipse.RenderTransform>
+                                                <CompositeTransform />
+                                            </Ellipse.RenderTransform>
+                                        </Ellipse>
+                                        <TextBlock
+                                            Text="{Binding MatchResultText}"
+                                            FontSize="14"
+                                            FontWeight="SemiBold" />
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                    <Grid
+                        Grid.Row="1"
+                        Margin="6,0,6,8"
+                        ColumnSpacing="10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition
+                                Width="38" />
+                            <ColumnDefinition
+                                Width="*" />
+                            <ColumnDefinition
+                                Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Grid
+                            Width="38"
+                            Height="38">
+                            <Border
+                                Style="{StaticResource ChessPlayerAvatarStyle}">
+                                <FontIcon
+                                    Glyph=""
+                                    FontSize="18"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center" />
+                            </Border>
+                        </Grid>
+                        <StackPanel
+                            Grid.Column="1"
+                            VerticalAlignment="Center">
+                            <TextBlock
+                                Text="{Binding MatchBlackName}"
+                                FontWeight="SemiBold" />
+                            <StackPanel
+                                Orientation="Horizontal"
+                                Spacing="8">
+                                <TextBlock
+                                    Text="Zdobyte:"
+                                    FontSize="11"
+                                    Opacity="0.58"
+                                    VerticalAlignment="Center" />
+                                <TextBlock
+                                    Text="{Binding MatchBlackCapturedPieces}"
+                                    FontFamily="Segoe UI Symbol"
+                                    FontSize="16"
+                                    Foreground="{StaticResource ChessPrimaryTextBrush}"
+                                    Opacity="0.92" />
+                                <TextBlock
+                                    Text="{Binding MatchBlackAdvantageText}"
+                                    FontSize="12"
+                                    FontWeight="SemiBold"
+                                    VerticalAlignment="Center" />
+                            </StackPanel>
+                        </StackPanel>
+                        <TextBlock
+                            Grid.Column="2"
+                            Text="{Binding BlackClock}"
+                            FontFamily="Cascadia Mono"
+                            FontSize="17"
+                            FontWeight="SemiBold"
+                            VerticalAlignment="Center"
+                            Margin="16,0,0,0" />
+                    </Grid>
+                    <Grid
+                        Grid.Row="2"
+                        ColumnSpacing="4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition
+                                Width="8" />
+                            <ColumnDefinition
+                                Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border
+                            x:Name="MatchAdvantageTrack"
+                            Grid.Column="0"
+                            Width="3"
+                            Margin="0,8,-2,8"
+                            CornerRadius="1.5"
+                            Background="{StaticResource ChessAdvantageTrackBrush}"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Stretch"
+                            SizeChanged="MatchAdvantageTrack_SizeChanged">
+                            <Grid>
+                                <Border
+                                    x:Name="MatchAdvantageFill"
+                                    Background="{StaticResource ChessPurpleBrush}"
+                                    VerticalAlignment="Top"
+                                    CornerRadius="1.5" />
+                                <Border
+                                    x:Name="MatchAdvantageWhiteFill"
+                                    Background="White"
+                                    VerticalAlignment="Bottom"
+                                    CornerRadius="1.5" />
+                                <Border
+                                    Height="1"
+                                    Background="{StaticResource ChessAdvantageCenterBrush}"
+                                    VerticalAlignment="Center" />
+                            </Grid>
+                        </Border>
+                        <Viewbox
+                            Grid.Column="1"
+                            Stretch="Uniform"
+                            StretchDirection="Both"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch">
+                            <Grid
+                                Width="650"
+                                Height="650">
+                                <Border
+                                    CornerRadius="8"
+                                    BorderThickness="1"
+                                    Padding="4">
+                                    <ItemsRepeater
+                                        ItemsSource="{Binding MatchSquares}"
+                                        Width="640"
+                                        Height="640">
+                                        <ItemsRepeater.Layout>
+                                            <UniformGridLayout
+                                                MinItemWidth="80"
+                                                MinItemHeight="80"
+                                                MaximumRowsOrColumns="8"
+                                                Orientation="Horizontal" />
+                                        </ItemsRepeater.Layout>
+                                        <ItemsRepeater.ItemTemplate>
+                                            <DataTemplate
+                                                x:DataType="vm:BoardSquareViewModel">
+                                                <Grid
+                                                    Width="80"
+                                                    Height="80"
+                                                    Background="{x:Bind Background, Mode=OneWay}">
+                                                    <TextBlock
+                                                        Text="{x:Bind PieceGlyph, Mode=OneWay}"
+                                                        Foreground="{x:Bind PieceBrush, Mode=OneWay}"
+                                                        FontFamily="Segoe UI Symbol"
+                                                        FontSize="56"
+                                                        HorizontalAlignment="Center"
+                                                        VerticalAlignment="Center" />
+                                                    <TextBlock
+                                                        Text="{x:Bind RankLabel, Mode=OneWay}"
+                                                        FontSize="12"
+                                                        FontWeight="Bold"
+                                                        Foreground="White"
+                                                        Opacity="0.95"
+                                                        Margin="5,3,0,0"
+                                                        HorizontalAlignment="Left"
+                                                        VerticalAlignment="Top" />
+                                                    <TextBlock
+                                                        Text="{x:Bind FileLabel, Mode=OneWay}"
+                                                        FontSize="12"
+                                                        FontWeight="Bold"
+                                                        Foreground="White"
+                                                        Opacity="0.95"
+                                                        Margin="0,0,5,3"
+                                                        HorizontalAlignment="Right"
+                                                        VerticalAlignment="Bottom" />
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsRepeater.ItemTemplate>
+                                    </ItemsRepeater>
+                                </Border>
+                            </Grid>
+                        </Viewbox>
+                    </Grid>
+                    <Grid
+                        Grid.Row="3"
+                        Margin="6,8,6,0"
+                        ColumnSpacing="10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition
+                                Width="38" />
+                            <ColumnDefinition
+                                Width="*" />
+                            <ColumnDefinition
+                                Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Grid
+                            Width="38"
+                            Height="38">
+                            <Border
+                                Style="{StaticResource ChessPlayerAvatarStyle}">
+                                <FontIcon
+                                    Glyph=""
+                                    FontSize="18"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center" />
+                            </Border>
+                        </Grid>
+                        <StackPanel
+                            Grid.Column="1"
+                            VerticalAlignment="Center">
+                            <TextBlock
+                                Text="{Binding MatchWhiteName}"
+                                FontWeight="SemiBold" />
+                            <StackPanel
+                                Orientation="Horizontal"
+                                Spacing="8">
+                                <TextBlock
+                                    Text="Zdobyte:"
+                                    FontSize="11"
+                                    Opacity="0.58"
+                                    VerticalAlignment="Center" />
+                                <TextBlock
+                                    Text="{Binding MatchWhiteCapturedPieces}"
+                                    FontFamily="Segoe UI Symbol"
+                                    FontSize="16"
+                                    Foreground="{StaticResource ChessPrimaryTextBrush}"
+                                    Opacity="0.95" />
+                                <TextBlock
+                                    Text="{Binding MatchWhiteAdvantageText}"
+                                    FontSize="12"
+                                    FontWeight="SemiBold"
+                                    VerticalAlignment="Center" />
+                            </StackPanel>
+                        </StackPanel>
+                        <TextBlock
+                            Grid.Column="2"
+                            Text="{Binding WhiteClock}"
+                            FontFamily="Cascadia Mono"
+                            FontSize="17"
+                            FontWeight="SemiBold"
+                            VerticalAlignment="Center"
+                            Margin="16,0,0,0" />
+                    </Grid>
+                </Grid>
+                <Border
+                    Grid.Column="1"
+                    BorderThickness="1,1,0,0"
+                    CornerRadius="12,0,0,0"
+                    Padding="0"
+                    HorizontalAlignment="Stretch"
+                    Background="{StaticResource ChessPanelBrush}"
+                    BorderBrush="{StaticResource ChessBorderBrush}"
+                    RequestedTheme="Dark">
+                    <Grid
+                        RowSpacing="14">
+                        <Grid.RowDefinitions>
+                            <RowDefinition
+                                Height="Auto" />
+                            <RowDefinition
+                                Height="Auto" />
+                            <RowDefinition
+                                Height="Auto" />
+                            <RowDefinition
+                                Height="*" />
+                        </Grid.RowDefinitions>
+                        <StackPanel
+                            Spacing="16"
+                            Margin="20,20,20,0">
+                            <TextBlock
+                                Text="Konfiguracja pojedynku"
+                                FontSize="20"
+                                FontWeight="SemiBold" />
+                            <Grid
+                                ColumnSpacing="14">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition
+                                        Width="*" />
+                                    <ColumnDefinition
+                                        Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <ComboBox
+                                    Header="Silnik A"
+                                    ItemsSource="{Binding Engines}"
+                                    DisplayMemberPath="Name"
+                                    SelectedItem="{Binding SelectedEngineA, Mode=TwoWay}"
+                                    HorizontalAlignment="Stretch"
+                                    IsEnabled="{Binding IsMatchConfigurationEnabled}" />
+                                <ComboBox
+                                    Grid.Column="1"
+                                    Header="Silnik B"
+                                    ItemsSource="{Binding Engines}"
+                                    DisplayMemberPath="Name"
+                                    SelectedItem="{Binding SelectedEngineB, Mode=TwoWay}"
+                                    HorizontalAlignment="Stretch"
+                                    IsEnabled="{Binding IsMatchConfigurationEnabled}" />
+                            </Grid>
+                            <ComboBox
+                                Header="Kolory"
+                                ItemsSource="{Binding ColorAssignments}"
+                                DisplayMemberPath="Name"
+                                SelectedItem="{Binding SelectedColorOption, Mode=TwoWay}"
+                                HorizontalAlignment="Stretch"
+                                IsEnabled="{Binding IsMatchConfigurationEnabled}" />
+                            <Grid
+                                ColumnSpacing="14">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition
+                                        Width="*" />
+                                    <ColumnDefinition
+                                        Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <NumberBox
+                                    Header="Czas (min)"
+                                    Minimum="0.25"
+                                    Maximum="60"
+                                    SmallChange="0.25"
+                                    Value="{Binding InitialTimeMinutes, Mode=TwoWay}"
+                                    SpinButtonPlacementMode="Compact"
+                                    IsEnabled="{Binding IsMatchConfigurationEnabled}" />
+                                <NumberBox
+                                    Grid.Column="1"
+                                    Header="Inkrement (s)"
+                                    Minimum="0"
+                                    Maximum="60"
+                                    Value="{Binding IncrementSeconds, Mode=TwoWay}"
+                                    SpinButtonPlacementMode="Compact"
+                                    IsEnabled="{Binding IsMatchConfigurationEnabled}" />
+                            </Grid>
+                            <Grid
+                                ColumnSpacing="10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition
+                                        Width="*" />
+                                    <ColumnDefinition
+                                        Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Button
+                                    Content="{Binding PrimaryMatchButtonText}"
+                                    Style="{StaticResource AccentButtonStyle}"
+                                    Click="ToggleEngineMatch_Click"
+                                    HorizontalAlignment="Stretch" />
+                                <Button
+                                    Grid.Column="1"
+                                    Content="Zakończ"
+                                    Click="StopEngineMatch_Click"
+                                    IsEnabled="{Binding IsMatchRunning}"
+                                    HorizontalAlignment="Stretch"
+                                    Style="{StaticResource ChessDangerButtonStyle}" />
+                            </Grid>
+                        </StackPanel>
+                        <InfoBar
+                            Grid.Row="1"
+                            Margin="20,0"
+                            IsOpen="{Binding HasError}"
+                            Severity="Error"
+                            IsClosable="False"
+                            Message="{Binding ErrorText}" />
+                        <Grid
+                            Grid.Row="2"
+                            Margin="20,0"
+                            Padding="0,4"
+                            ColumnSpacing="14">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition
+                                    Width="Auto" />
+                                <ColumnDefinition
+                                    Width="*" />
+                                <ColumnDefinition
+                                    Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <ProgressRing
+                                IsActive="{Binding IsMatchThinking}"
+                                Width="11"
+                                Height="11"
+                                VerticalAlignment="Center"
+                                Margin="0,0,2,0" />
+                            <StackPanel
+                                Grid.Column="1">
+                                <TextBlock
+                                    Text="{Binding MatchActivityText}"
+                                    FontSize="12"
+                                    FontWeight="SemiBold" />
+                                <TextBlock
+                                    Text="{Binding MatchDepth}"
+                                    FontSize="10"
+                                    Opacity="0.6" />
+                            </StackPanel>
+                            <TextBlock
+                                Grid.Column="2"
+                                Text="{Binding MatchOutcomeText}"
+                                FontSize="12"
+                                FontWeight="SemiBold"
+                                Foreground="{StaticResource ChessSuccessBrush}"
+                                VerticalAlignment="Center"
+                                TextAlignment="Right" />
+                        </Grid>
+                        <Border
+                            Grid.Row="3"
+                            Margin="0,2,0,0"
+                            BorderThickness="0,1,0,0"
+                            BorderBrush="{StaticResource ChessBorderBrush}"
+                            Background="{StaticResource ChessPanelBrush}">
+                            <Grid
+                                Padding="20,12,20,0"
+                                Background="{StaticResource ChessPanelBrush}">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition
+                                        Height="Auto" />
+                                    <RowDefinition
+                                        Height="Auto" />
+                                    <RowDefinition
+                                        Height="*" />
+                                    <RowDefinition
+                                        Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <TextBlock
+                                    Text="Dziennik ruchów"
+                                    FontSize="16"
+                                    FontWeight="SemiBold"
+                                    Margin="0,0,0,8" />
+                                <Grid
+                                    Grid.Row="1"
+                                    Padding="10,7"
+                                    ColumnSpacing="8"
+                                    Background="Transparent">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition
+                                            Width="36" />
+                                        <ColumnDefinition
+                                            Width="*" />
+                                        <ColumnDefinition
+                                            Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock
+                                        Text="#" />
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Text="Białe" />
+                                    <TextBlock
+                                        Grid.Column="2"
+                                        Text="Czarne" />
+                                </Grid>
+                                <ListView
+                                    Grid.Row="2"
+                                    ItemsSource="{Binding MatchMoveLog}"
+                                    SelectionMode="Single"
+                                    SelectionChanged="MatchMoveLog_SelectionChanged"
+                                    HorizontalContentAlignment="Stretch"
+                                    Background="{StaticResource ChessPanelBrush}"
+                                    CornerRadius="0">
+                                    <ListView.ItemTemplate>
+                                        <DataTemplate
+                                            x:DataType="vm:MoveLogEntryViewModel">
+                                            <Grid
+                                                Padding="6,4"
+                                                ColumnSpacing="8">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition
+                                                        Width="36" />
+                                                    <ColumnDefinition
+                                                        Width="*" />
+                                                    <ColumnDefinition
+                                                        Width="*" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock
+                                                    Text="{x:Bind Number}"
+                                                    Opacity="0.6" />
+                                                <TextBlock
+                                                    Grid.Column="1"
+                                                    Text="{x:Bind WhiteMove}"
+                                                    FontFamily="Cascadia Mono" />
+                                                <TextBlock
+                                                    Grid.Column="2"
+                                                    Text="{x:Bind BlackMove}"
+                                                    FontFamily="Cascadia Mono" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ListView.ItemTemplate>
+                                </ListView>
+                                <Grid
+                                    Grid.Row="3"
+                                    Padding="0,8,0,10"
+                                    ColumnSpacing="10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition
+                                            Width="Auto" />
+                                        <ColumnDefinition
+                                            Width="*" />
+                                        <ColumnDefinition
+                                            Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <Button
+                                        Width="36"
+                                        Height="32"
+                                        Padding="0"
+                                        Click="MatchHistoryPrevious_Click"
+                                        IsEnabled="{Binding CanBrowsePreviousMatchPosition}"
+                                        ToolTipService.ToolTip="Poprzedni ruch"
+                                        AutomationProperties.Name="Poprzedni ruch">
+                                        <FontIcon
+                                            Glyph=""
+                                            FontSize="13" />
+                                    </Button>
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Text="{Binding MatchHistoryPositionText}"
+                                        FontSize="12"
+                                        Opacity="0.72"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center" />
+                                    <Button
+                                        Grid.Column="2"
+                                        Width="36"
+                                        Height="32"
+                                        Padding="0"
+                                        Click="MatchHistoryNext_Click"
+                                        IsEnabled="{Binding CanBrowseNextMatchPosition}"
+                                        ToolTipService.ToolTip="Następny ruch"
+                                        AutomationProperties.Name="Następny ruch">
+                                        <FontIcon
+                                            Glyph=""
+                                            FontSize="13" />
+                                    </Button>
+                                </Grid>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </Border>
+            </Grid>
+            <!-- Liga silników: konfiguracja, tabela, terminarz i statystyki -->
+            <Grid
+                x:Name="TournamentView"
+                Visibility="Collapsed"
+                Padding="24"
+                RowSpacing="16"
+                DataContext="{x:Bind Hub}">
+                <Grid.RowDefinitions>
+                    <RowDefinition
+                        Height="Auto" />
+                    <RowDefinition
+                        Height="*" />
+                </Grid.RowDefinitions>
+                <Grid>
+                    <StackPanel>
+                        <TextBlock
+                            Text="Turniej silników"
+                            FontSize="28"
+                            FontWeight="SemiBold" />
+                        <TextBlock
+                            Text="Liga dwurundowa · każdy z każdym, mecz i rewanż"
+                            Opacity="0.65" />
+                    </StackPanel>
+                    <StackPanel
+                        Orientation="Horizontal"
+                        Spacing="14"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center">
+                        <StackPanel>
+                            <TextBlock
+                                Text="{Binding TournamentStatusText}"
+                                FontWeight="SemiBold"
+                                HorizontalAlignment="Right" />
+                            <TextBlock
+                                Text="{Binding TournamentRoundText}"
+                                FontSize="12"
+                                Opacity="0.6"
+                                HorizontalAlignment="Right" />
+                        </StackPanel>
+                        <Button
+                            Content="Szczegóły"
+                            Click="OpenTournamentDetails_Click" />
+                        <Button
+                            Content="Nowy turniej"
+                            Click="NewTournament_Click"
+                            IsEnabled="{Binding CanCreateNewTournament}" />
+                    </StackPanel>
+                </Grid>
+                <Grid
+                    Grid.Row="1"
+                    ColumnSpacing="20">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition
+                            Width="360" />
+                        <ColumnDefinition
+                            Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Border
+                        Background="{StaticResource ChessPanelBrush}"
+                        BorderBrush="{StaticResource ChessBorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="12"
+                        Padding="18"
+                        RequestedTheme="Dark">
+                        <Grid
+                            RowSpacing="12">
+                            <Grid.RowDefinitions>
+                                <RowDefinition
+                                    Height="Auto" />
+                                <RowDefinition
+                                    Height="*" />
+                                <RowDefinition
+                                    Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <StackPanel
+                                Spacing="10">
+                                <TextBlock
+                                    Text="Konfiguracja"
+                                    FontSize="18"
+                                    FontWeight="SemiBold" />
+                                <TextBox
+                                    Header="Nazwa turnieju"
+                                    PlaceholderText="Wpisz nazwę turnieju"
+                                    Text="{Binding TournamentName, Mode=TwoWay}"
+                                    IsEnabled="{Binding IsTournamentConfigurationEnabled}" />
+                                <Grid
+                                    ColumnSpacing="8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition
+                                            Width="*" />
+                                        <ColumnDefinition
+                                            Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <NumberBox
+                                        Header="Czas (min)"
+                                        Minimum="0.25"
+                                        Maximum="60"
+                                        Value="{Binding InitialTimeMinutes, Mode=TwoWay}"
+                                        IsEnabled="{Binding IsTournamentConfigurationEnabled}" />
+                                    <NumberBox
+                                        Grid.Column="1"
+                                        Header="Inkrement (s)"
+                                        Minimum="0"
+                                        Maximum="60"
+                                        Value="{Binding IncrementSeconds, Mode=TwoWay}"
+                                        IsEnabled="{Binding IsTournamentConfigurationEnabled}" />
+                                </Grid>
+                                <CheckBox
+                                    Content="Automatycznie uruchamiaj następną rundę"
+                                    IsChecked="{Binding AutoStartNextRound, Mode=TwoWay}"
+                                    IsEnabled="{Binding IsTournamentConfigurationEnabled}" />
+                                <CheckBox
+                                    Content="Zapisz powtórki meczów lokalnie"
+                                    IsChecked="{Binding SaveTournamentLocally, Mode=TwoWay}"
+                                    IsEnabled="{Binding IsTournamentConfigurationEnabled}" />
+                                <TextBlock
+                                    Text="Silniki"
+                                    FontWeight="SemiBold"
+                                    Margin="0,4,0,0" />
+                            </StackPanel>
+                            <ListView
+                                Grid.Row="1"
+                                ItemsSource="{Binding TournamentEngineChoices}"
+                                SelectionMode="None"
+                                Background="{StaticResource ChessPanelBrush}"
+                                IsEnabled="{Binding IsTournamentConfigurationEnabled}">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate
+                                        x:DataType="vm:EngineSelectionItem">
+                                        <CheckBox
+                                            IsChecked="{x:Bind IsSelected, Mode=TwoWay}"
+                                            Content="{x:Bind Name}"
+                                            MinHeight="36" />
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                            <StackPanel
+                                Grid.Row="2"
+                                Spacing="8">
+                                <Grid
+                                    ColumnSpacing="8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition
+                                            Width="Auto" />
+                                        <ColumnDefinition
+                                            Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Button
+                                        Content="Przetasuj"
+                                        Click="RerollTournament_Click"
+                                        IsEnabled="{Binding IsTournamentDraft}"
+                                        HorizontalAlignment="Stretch" />
+                                    <Button
+                                        Grid.Column="1"
+                                        Content="{Binding TournamentStartButtonText}"
+                                        Click="StartTournament_Click"
+                                        IsEnabled="{Binding CanStartTournamentRound}"
+                                        HorizontalAlignment="Stretch"
+                                        Style="{StaticResource AccentButtonStyle}" />
+                                </Grid>
+                                <Button
+                                    Content="Zakończ turniej"
+                                    Click="StopTournament_Click"
+                                    IsEnabled="{Binding CanStopTournament}"
+                                    HorizontalAlignment="Stretch"
+                                    Style="{StaticResource ChessDangerButtonStyle}" />
+                                <InfoBar
+                                    IsOpen="{Binding HasError}"
+                                    Severity="Error"
+                                    IsClosable="False"
+                                    Message="{Binding ErrorText}" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                    <Grid
+                        Grid.Column="1"
+                        RowSpacing="10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition
+                                Height="Auto" />
+                            <RowDefinition
+                                Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid>
+                            <TextBlock
+                                Text="Przebieg turnieju"
+                                FontSize="20"
+                                FontWeight="SemiBold"
+                                VerticalAlignment="Center" />
+                            <Button
+                                Content="Oglądaj bieżący mecz"
+                                Click="WatchCurrentTournamentMatch_Click"
+                                IsEnabled="{Binding IsTournamentRunning}"
+                                HorizontalAlignment="Right" />
+                        </Grid>
+                        <Grid
+                            Grid.Row="1">
+                            <Grid.RowDefinitions>
+                                <RowDefinition
+                                    Height="Auto" />
+                                <RowDefinition
+                                    Height="*" />
+                            </Grid.RowDefinitions>
+                            <SelectorBar
+                                x:Name="TournamentSelector"
+                                SelectionChanged="TournamentSelector_SelectionChanged">
+                                <SelectorBarItem
+                                    x:Name="TournamentStandingsSelector"
+                                    Text="Tabela"
+                                    IsSelected="True" />
+                                <SelectorBarItem
+                                    Text="Zakończone mecze" />
+                                <SelectorBarItem
+                                    Text="Nadchodzące" />
+                                <SelectorBarItem
+                                    Text="Statystyki" />
+                            </SelectorBar>
+                            <Grid
+                                Grid.Row="1">
+                                <Grid
+                                    x:Name="TournamentStandingsContent">
+                                    <Grid>
+                                        <ListView
+                                            ItemsSource="{Binding TournamentStatistics}"
+                                            SelectionMode="None">
+                                            <ListView.Header>
+                                                <Grid
+                                                    Padding="10"
+                                                    ColumnSpacing="8">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition
+                                                            Width="42" />
+                                                        <ColumnDefinition
+                                                            Width="*" />
+                                                        <ColumnDefinition
+                                                            Width="55" />
+                                                        <ColumnDefinition
+                                                            Width="55" />
+                                                        <ColumnDefinition
+                                                            Width="55" />
+                                                        <ColumnDefinition
+                                                            Width="55" />
+                                                        <ColumnDefinition
+                                                            Width="75" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock
+                                                        Text="#" />
+                                                    <TextBlock
+                                                        Grid.Column="1"
+                                                        Text="Silnik" />
+                                                    <TextBlock
+                                                        Grid.Column="2"
+                                                        Text="M" />
+                                                    <TextBlock
+                                                        Grid.Column="3"
+                                                        Text="W" />
+                                                    <TextBlock
+                                                        Grid.Column="4"
+                                                        Text="R" />
+                                                    <TextBlock
+                                                        Grid.Column="5"
+                                                        Text="P" />
+                                                    <TextBlock
+                                                        Grid.Column="6"
+                                                        Text="Punkty" />
+                                                </Grid>
+                                            </ListView.Header>
+                                            <ListView.ItemTemplate>
+                                                <DataTemplate
+                                                    x:DataType="models:TournamentEngineStatistic" xmlns:models="using:ChessDesktopApp.Models">
+                                                    <Grid
+                                                        Padding="10"
+                                                        ColumnSpacing="8">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition
+                                                                Width="42" />
+                                                            <ColumnDefinition
+                                                                Width="*" />
+                                                            <ColumnDefinition
+                                                                Width="55" />
+                                                            <ColumnDefinition
+                                                                Width="55" />
+                                                            <ColumnDefinition
+                                                                Width="55" />
+                                                            <ColumnDefinition
+                                                                Width="55" />
+                                                            <ColumnDefinition
+                                                                Width="75" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock
+                                                            Text="{x:Bind Place}" />
+                                                        <TextBlock
+                                                            Grid.Column="1"
+                                                            Text="{x:Bind EngineName}"
+                                                            FontWeight="SemiBold" />
+                                                        <TextBlock
+                                                            Grid.Column="2"
+                                                            Text="{x:Bind Played}" />
+                                                        <TextBlock
+                                                            Grid.Column="3"
+                                                            Text="{x:Bind Wins}" />
+                                                        <TextBlock
+                                                            Grid.Column="4"
+                                                            Text="{x:Bind Draws}" />
+                                                        <TextBlock
+                                                            Grid.Column="5"
+                                                            Text="{x:Bind Losses}" />
+                                                        <TextBlock
+                                                            Grid.Column="6"
+                                                            Text="{x:Bind PointsText}"
+                                                            FontWeight="SemiBold" />
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ListView.ItemTemplate>
+                                        </ListView>
+                                        <TextBlock
+                                            Visibility="{Binding TournamentStatisticsEmptyVisibility}"
+                                            Text="Brak wyników turnieju"
+                                            Padding="50"
+                                            Opacity="0.7"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center" />
+                                    </Grid>
+                                </Grid>
+                                <Grid
+                                    x:Name="TournamentCompletedContent"
+                                    Visibility="Collapsed">
+                                    <Grid
+                                        RowSpacing="8">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition
+                                                Height="*" />
+                                            <RowDefinition
+                                                Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <Grid>
+                                            <ListView
+                                                ItemsSource="{Binding CompletedTournamentMatches}"
+                                                IsItemClickEnabled="True"
+                                                SelectionMode="None"
+                                                ItemClick="CompletedTournamentMatch_ItemClick">
+                                                <ListView.ItemTemplate>
+                                                    <DataTemplate
+                                                        x:DataType="models:TournamentMatch" xmlns:models="using:ChessDesktopApp.Models">
+                                                        <Grid
+                                                            Padding="10"
+                                                            ColumnSpacing="12">
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition
+                                                                    Width="90" />
+                                                                <ColumnDefinition
+                                                                    Width="*" />
+                                                                <ColumnDefinition
+                                                                    Width="90" />
+                                                            </Grid.ColumnDefinitions>
+                                                            <TextBlock
+                                                                Text="{x:Bind RoundText}"
+                                                                Opacity="0.65" />
+                                                            <StackPanel
+                                                                Grid.Column="1">
+                                                                <TextBlock
+                                                                    Text="{x:Bind PairingText}"
+                                                                    FontWeight="SemiBold" />
+                                                                <TextBlock
+                                                                    Text="{x:Bind ColorText}"
+                                                                    FontSize="11"
+                                                                    Opacity="0.55" />
+                                                            </StackPanel>
+                                                            <TextBlock
+                                                                Grid.Column="2"
+                                                                Text="{x:Bind Result}"
+                                                                HorizontalAlignment="Right" />
+                                                        </Grid>
+                                                    </DataTemplate>
+                                                </ListView.ItemTemplate>
+                                            </ListView>
+                                            <TextBlock
+                                                Visibility="{Binding CompletedMatchesEmptyVisibility}"
+                                                Text="Brak zakończonych meczów"
+                                                Padding="50"
+                                                Opacity="0.7"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center" />
+                                        </Grid>
+                                    </Grid>
+                                </Grid>
+                                <Grid
+                                    x:Name="TournamentUpcomingContent"
+                                    Visibility="Collapsed">
+                                    <Grid>
+                                        <ListView
+                                            ItemsSource="{Binding UpcomingTournamentMatches}"
+                                            SelectionMode="None">
+                                            <ListView.ItemTemplate>
+                                                <DataTemplate
+                                                    x:DataType="models:TournamentMatch" xmlns:models="using:ChessDesktopApp.Models">
+                                                    <Grid
+                                                        Padding="10"
+                                                        ColumnSpacing="12">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition
+                                                                Width="90" />
+                                                            <ColumnDefinition
+                                                                Width="*" />
+                                                            <ColumnDefinition
+                                                                Width="Auto" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock
+                                                            Text="{x:Bind RoundText}"
+                                                            Opacity="0.65" />
+                                                        <StackPanel
+                                                            Grid.Column="1">
+                                                            <TextBlock
+                                                                Text="{x:Bind PairingText}"
+                                                                FontWeight="SemiBold" />
+                                                            <TextBlock
+                                                                Text="{x:Bind ColorText}"
+                                                                FontSize="11"
+                                                                Opacity="0.55" />
+                                                        </StackPanel>
+                                                        <TextBlock
+                                                            Grid.Column="2"
+                                                            Text="Oczekuje"
+                                                            Opacity="0.65" />
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ListView.ItemTemplate>
+                                        </ListView>
+                                        <TextBlock
+                                            Visibility="{Binding UpcomingMatchesEmptyVisibility}"
+                                            Text="Brak nadchodzących meczów"
+                                            Padding="50"
+                                            Opacity="0.7"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center" />
+                                    </Grid>
+                                </Grid>
+                                <Grid
+                                    x:Name="TournamentStatisticsContent"
+                                    Visibility="Collapsed">
+                                    <Grid>
+                                        <ScrollViewer>
+                                            <ItemsControl
+                                                ItemsSource="{Binding TournamentStatistics}">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate
+                                                        x:DataType="models:TournamentEngineStatistic" xmlns:models="using:ChessDesktopApp.Models">
+                                                        <Border
+                                                            BorderBrush="{StaticResource ChessBorderBrush}"
+                                                            BorderThickness="1"
+                                                            CornerRadius="8"
+                                                            Padding="14"
+                                                            Margin="0,0,0,8">
+                                                            <Grid
+                                                                ColumnSpacing="14">
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition
+                                                                        Width="170" />
+                                                                    <ColumnDefinition
+                                                                        Width="*" />
+                                                                    <ColumnDefinition
+                                                                        Width="150" />
+                                                                </Grid.ColumnDefinitions>
+                                                                <StackPanel>
+                                                                    <TextBlock
+                                                                        Text="{x:Bind EngineName}"
+                                                                        FontWeight="SemiBold" />
+                                                                    <TextBlock
+                                                                        Text="{x:Bind DetailedRecordText}"
+                                                                        FontSize="12"
+                                                                        Opacity="0.6" />
+                                                                </StackPanel>
+                                                                <ProgressBar
+                                                                    Grid.Column="1"
+                                                                    Minimum="0"
+                                                                    Maximum="{x:Bind MaximumPoints}"
+                                                                    Value="{x:Bind Points}"
+                                                                    Height="8"
+                                                                    VerticalAlignment="Center" />
+                                                                <StackPanel
+                                                                    Grid.Column="2"
+                                                                    HorizontalAlignment="Right">
+                                                                    <TextBlock
+                                                                        Text="{x:Bind PointsText}"
+                                                                        FontSize="18"
+                                                                        FontWeight="SemiBold"
+                                                                        HorizontalAlignment="Right" />
+                                                                    <TextBlock
+                                                                        Text="{x:Bind WinRateText}"
+                                                                        FontSize="12"
+                                                                        Opacity="0.6"
+                                                                        HorizontalAlignment="Right" />
+                                                                </StackPanel>
+                                                            </Grid>
+                                                        </Border>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </ScrollViewer>
+                                        <TextBlock
+                                            Visibility="{Binding TournamentStatisticsEmptyVisibility}"
+                                            Text="Brak statystyk turnieju"
+                                            Padding="50"
+                                            Opacity="0.7"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center" />
+                                    </Grid>
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </Grid>
+            <!-- Tylko do odczytu: szczegóły turnieju -->
+            <Grid
+                x:Name="TournamentDetailView"
+                Visibility="Collapsed"
+                Padding="24"
+                RowSpacing="16"
+                DataContext="{x:Bind Hub}">
+                <Grid.RowDefinitions>
+                    <RowDefinition
+                        Height="Auto" />
+                    <RowDefinition
+                        Height="*" />
+                </Grid.RowDefinitions>
+                <Grid
+                    ColumnSpacing="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition
+                            Width="Auto" />
+                        <ColumnDefinition
+                            Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Button
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Click="BackFromTournamentDetail_Click"
+                        AutomationProperties.Name="Wróć">
+                        <Button.Resources>
+                            <SolidColorBrush
+                                x:Key="ButtonBackgroundPointerOver"
+                                Color="Transparent" />
+                            <SolidColorBrush
+                                x:Key="ButtonBackgroundPressed"
+                                Color="Transparent" />
+                            <SolidColorBrush
+                                x:Key="ButtonForegroundPointerOver"
+                                Color="{StaticResource ChessIconPointerOverColor}" />
+                        </Button.Resources>
+                        <Image
+                            Source="Assets/BackChevron.png"
+                            Width="25"
+                            Height="25"
+                            Stretch="Uniform" />
+                    </Button>
+                    <StackPanel
+                        Grid.Column="1">
+                        <TextBlock
+                            Text="{Binding TournamentDetailName}"
+                            FontSize="26"
+                            FontWeight="SemiBold" />
+                        <TextBlock
+                            Text="{Binding TournamentDetailStatus}"
+                            Opacity="0.65" />
+                    </StackPanel>
+                </Grid>
+                <Grid
+                    Grid.Row="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition
+                            Height="Auto" />
+                        <RowDefinition
+                            Height="*" />
+                    </Grid.RowDefinitions>
+                    <SelectorBar
+                        x:Name="TournamentDetailSelector"
+                        SelectionChanged="TournamentDetailSelector_SelectionChanged">
+                        <SelectorBarItem
+                            x:Name="TournamentDetailStandingsSelector"
+                            Text="Tabela"
+                            IsSelected="True" />
+                        <SelectorBarItem
+                            Text="Wszystkie mecze" />
+                        <SelectorBarItem
+                            Text="Nadchodzące" />
+                        <SelectorBarItem
+                            Text="Statystyki" />
+                    </SelectorBar>
+                    <Grid
+                        Grid.Row="1">
+                        <Grid
+                            x:Name="TournamentDetailStandingsContent">
+                            <Grid>
+                                <ListView
+                                    ItemsSource="{Binding TournamentStatistics}"
+                                    SelectionMode="None">
+                                    <ListView.Header>
+                                        <Grid
+                                            Padding="10">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition
+                                                    Width="50" />
+                                                <ColumnDefinition
+                                                    Width="*" />
+                                                <ColumnDefinition
+                                                    Width="90" />
+                                                <ColumnDefinition
+                                                    Width="90" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock
+                                                Text="#" />
+                                            <TextBlock
+                                                Grid.Column="1"
+                                                Text="Silnik" />
+                                            <TextBlock
+                                                Grid.Column="2"
+                                                Text="W-R-P" />
+                                            <TextBlock
+                                                Grid.Column="3"
+                                                Text="Punkty" />
+                                        </Grid>
+                                    </ListView.Header>
+                                    <ListView.ItemTemplate>
+                                        <DataTemplate
+                                            x:DataType="models:TournamentEngineStatistic" xmlns:models="using:ChessDesktopApp.Models">
+                                            <Grid
+                                                Padding="10">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition
+                                                        Width="50" />
+                                                    <ColumnDefinition
+                                                        Width="*" />
+                                                    <ColumnDefinition
+                                                        Width="90" />
+                                                    <ColumnDefinition
+                                                        Width="90" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock
+                                                    Text="{x:Bind Place}" />
+                                                <TextBlock
+                                                    Grid.Column="1"
+                                                    Text="{x:Bind EngineName}"
+                                                    FontWeight="SemiBold" />
+                                                <TextBlock
+                                                    Grid.Column="2"
+                                                    Text="{x:Bind RecordText}" />
+                                                <TextBlock
+                                                    Grid.Column="3"
+                                                    Text="{x:Bind PointsText}" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ListView.ItemTemplate>
+                                </ListView>
+                                <TextBlock
+                                    Visibility="{Binding TournamentStatisticsEmptyVisibility}"
+                                    Text="Brak wyników turnieju"
+                                    Padding="50"
+                                    Opacity="0.7"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center" />
+                            </Grid>
+                        </Grid>
+                        <Grid
+                            x:Name="TournamentDetailMatchesContent"
+                            Visibility="Collapsed">
+                            <Grid>
+                                <ListView
+                                    ItemsSource="{Binding BracketMatches}"
+                                    SelectionChanged="TournamentMatchDetail_SelectionChanged"
+                                    ItemContainerStyle="{StaticResource TournamentCardListViewItemStyle}">
+                                    <ListView.ItemTemplate>
+                                        <DataTemplate
+                                            x:DataType="models:TournamentMatch" xmlns:models="using:ChessDesktopApp.Models">
+                                            <Grid
+                                                ColumnSpacing="14">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition
+                                                        Width="90" />
+                                                    <ColumnDefinition
+                                                        Width="*" />
+                                                    <ColumnDefinition
+                                                        Width="135" />
+                                                    <ColumnDefinition
+                                                        Width="90" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock
+                                                    Text="{x:Bind RoundText}"
+                                                    VerticalAlignment="Center"
+                                                    Opacity="0.72" />
+                                                <StackPanel
+                                                    Grid.Column="1">
+                                                    <TextBlock
+                                                        Text="{x:Bind PairingText}"
+                                                        FontWeight="SemiBold" />
+                                                    <TextBlock
+                                                        Text="{x:Bind ColorText}"
+                                                        FontSize="11"
+                                                        Opacity="0.55" />
+                                                </StackPanel>
+                                                <StackPanel
+                                                    Grid.Column="2"
+                                                    Orientation="Horizontal"
+                                                    Spacing="8"
+                                                    HorizontalAlignment="Left"
+                                                    VerticalAlignment="Center">
+                                                    <Ellipse
+                                                        Width="9"
+                                                        Height="9"
+                                                        Fill="{x:Bind StatusBrush}" />
+                                                    <TextBlock
+                                                        Text="{x:Bind StatusDisplayText}"
+                                                        FontWeight="SemiBold" />
+                                                </StackPanel>
+                                                <TextBlock
+                                                    Grid.Column="3"
+                                                    Text="{x:Bind ResultText}"
+                                                    HorizontalAlignment="Right"
+                                                    VerticalAlignment="Center"
+                                                    FontWeight="SemiBold" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ListView.ItemTemplate>
+                                </ListView>
+                                <TextBlock
+                                    Visibility="{Binding BracketMatchesEmptyVisibility}"
+                                    Text="Brak meczów w turnieju"
+                                    Padding="50"
+                                    Opacity="0.7"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center" />
+                            </Grid>
+                        </Grid>
+                        <Grid
+                            x:Name="TournamentDetailUpcomingContent"
+                            Visibility="Collapsed">
+                            <Grid>
+                                <ListView
+                                    ItemsSource="{Binding UpcomingTournamentMatches}"
+                                    SelectionChanged="TournamentMatchDetail_SelectionChanged">
+                                    <ListView.ItemTemplate>
+                                        <DataTemplate
+                                            x:DataType="models:TournamentMatch" xmlns:models="using:ChessDesktopApp.Models">
+                                            <Grid
+                                                Padding="10"
+                                                ColumnSpacing="12">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition
+                                                        Width="90" />
+                                                    <ColumnDefinition
+                                                        Width="*" />
+                                                    <ColumnDefinition
+                                                        Width="100" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock
+                                                    Text="{x:Bind RoundText}" />
+                                                <TextBlock
+                                                    Grid.Column="1"
+                                                    Text="{x:Bind PairingText}"
+                                                    FontWeight="SemiBold" />
+                                                <TextBlock
+                                                    Grid.Column="2"
+                                                    Text="Oczekuje" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ListView.ItemTemplate>
+                                </ListView>
+                                <TextBlock
+                                    Visibility="{Binding UpcomingMatchesEmptyVisibility}"
+                                    Text="Brak nadchodzących meczów"
+                                    Padding="50"
+                                    Opacity="0.7"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center" />
+                            </Grid>
+                        </Grid>
+                        <Grid
+                            x:Name="TournamentDetailStatisticsContent"
+                            Visibility="Collapsed">
+                            <Grid>
+                                <ScrollViewer>
+                                    <ItemsControl
+                                        ItemsSource="{Binding TournamentStatistics}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate
+                                                x:DataType="models:TournamentEngineStatistic" xmlns:models="using:ChessDesktopApp.Models">
+                                                <Border
+                                                    BorderBrush="{StaticResource ChessBorderBrush}"
+                                                    BorderThickness="1"
+                                                    CornerRadius="8"
+                                                    Padding="14"
+                                                    Margin="0,0,0,8">
+                                                    <Grid
+                                                        ColumnSpacing="14">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition
+                                                                Width="180" />
+                                                            <ColumnDefinition
+                                                                Width="*" />
+                                                            <ColumnDefinition
+                                                                Width="100" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <StackPanel>
+                                                            <TextBlock
+                                                                Text="{x:Bind EngineName}"
+                                                                FontWeight="SemiBold" />
+                                                            <TextBlock
+                                                                Text="{x:Bind DetailedRecordText}"
+                                                                FontSize="12"
+                                                                Opacity="0.6" />
+                                                        </StackPanel>
+                                                        <ProgressBar
+                                                            Grid.Column="1"
+                                                            Maximum="{x:Bind MaximumPoints}"
+                                                            Value="{x:Bind Points}"
+                                                            Height="8"
+                                                            VerticalAlignment="Center" />
+                                                        <TextBlock
+                                                            Grid.Column="2"
+                                                            Text="{x:Bind PointsText}"
+                                                            FontSize="18"
+                                                            FontWeight="SemiBold"
+                                                            HorizontalAlignment="Right" />
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </ScrollViewer>
+                                <TextBlock
+                                    Visibility="{Binding TournamentStatisticsEmptyVisibility}"
+                                    Text="Brak statystyk turnieju"
+                                    Padding="50"
+                                    Opacity="0.7"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center" />
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </Grid>
+            <!-- Osobna instancja obserwatora partii/powtórki -->
+            <Grid
+                x:Name="ObserverDetailView"
+                Visibility="Collapsed"
+                Padding="24"
+                RowSpacing="14"
+                DataContext="{x:Bind Hub}"
+                SizeChanged="ObserverDetailView_SizeChanged">
+                <Grid.RowDefinitions>
+                    <RowDefinition
+                        Height="Auto" />
+                    <RowDefinition
+                        Height="*" />
+                </Grid.RowDefinitions>
+                <Grid
+                    ColumnSpacing="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition
+                            Width="Auto" />
+                        <ColumnDefinition
+                            Width="*" />
+                        <ColumnDefinition
+                            Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Button
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Click="BackFromObserver_Click"
+                        AutomationProperties.Name="Wróć">
+                        <Button.Resources>
+                            <SolidColorBrush
+                                x:Key="ButtonBackgroundPointerOver"
+                                Color="Transparent" />
+                            <SolidColorBrush
+                                x:Key="ButtonBackgroundPressed"
+                                Color="Transparent" />
+                            <SolidColorBrush
+                                x:Key="ButtonForegroundPointerOver"
+                                Color="{StaticResource ChessIconPointerOverColor}" />
+                        </Button.Resources>
+                        <Image
+                            Source="Assets/BackChevron.png"
+                            Width="25"
+                            Height="25"
+                            Stretch="Uniform" />
+                    </Button>
+                    <StackPanel
+                        Grid.Column="1">
+                        <TextBlock
+                            Text="{Binding ObserverTitle}"
+                            FontSize="24"
+                            FontWeight="SemiBold" />
+                        <TextBlock
+                            Text="{Binding ObserverStatus}"
+                            Opacity="0.65" />
+                    </StackPanel>
+                    <StackPanel
+                        Grid.Column="2"
+                        Orientation="Horizontal"
+                        Spacing="12">
+                        <Ellipse
+                            Width="9"
+                            Height="9"
+                            Fill="{Binding ObserverStateBrush}" />
+                        <TextBlock
+                            Text="{Binding ObserverWinnerText}"
+                            Height="22"
+                            FontWeight="SemiBold" />
+                    </StackPanel>
+                </Grid>
+                <Grid
+                    Grid.Row="1"
+                    ColumnSpacing="22">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition
+                            Width="Auto" />
+                        <ColumnDefinition
+                            Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid
+                        x:Name="ObserverMatchColumn"
+                        Width="650"
+                        HorizontalAlignment="Left">
+                        <Grid.RowDefinitions>
+                            <RowDefinition
+                                Height="Auto" />
+                            <RowDefinition
+                                Height="*" />
+                            <RowDefinition
+                                Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid
+                            Margin="6,0,6,8"
+                            ColumnSpacing="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition
+                                    Width="38" />
+                                <ColumnDefinition
+                                    Width="*" />
+                                <ColumnDefinition
+                                    Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Border
+                                Style="{StaticResource ChessPlayerAvatarStyle}">
+                                <FontIcon
+                                    Glyph=""
+                                    FontSize="18" />
+                            </Border>
+                            <StackPanel
+                                Grid.Column="1"
+                                VerticalAlignment="Center">
+                                <TextBlock
+                                    Text="{Binding ObserverBlackName}"
+                                    FontWeight="SemiBold" />
+                                <StackPanel
+                                    Orientation="Horizontal"
+                                    Spacing="8">
+                                    <TextBlock
+                                        Text="Zdobyte:"
+                                        FontSize="11"
+                                        Opacity="0.58"
+                                        VerticalAlignment="Center" />
+                                    <TextBlock
+                                        Text="{Binding ObserverBlackCapturedPieces}"
+                                        FontFamily="Segoe UI Symbol"
+                                        FontSize="16"
+                                        Foreground="{StaticResource ChessPrimaryTextBrush}"
+                                        Opacity="0.92" />
+                                    <TextBlock
+                                        Text="{Binding ObserverBlackAdvantageText}"
+                                        FontSize="12"
+                                        FontWeight="SemiBold"
+                                        VerticalAlignment="Center" />
+                                </StackPanel>
+                            </StackPanel>
+                            <TextBlock
+                                Grid.Column="2"
+                                Text="{Binding ObserverBlackClock}"
+                                FontFamily="Cascadia Mono"
+                                FontSize="17"
+                                FontWeight="SemiBold"
+                                VerticalAlignment="Center"
+                                Margin="16,0,0,0" />
+                        </Grid>
+                        <Grid
+                            Grid.Row="1"
+                            ColumnSpacing="4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition
+                                    Width="8" />
+                                <ColumnDefinition
+                                    Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Border
+                                x:Name="ObserverAdvantageTrack"
+                                Grid.Column="0"
+                                Width="3"
+                                Margin="0,8,-2,8"
+                                CornerRadius="1.5"
+                                Background="{StaticResource ChessAdvantageTrackBrush}"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Stretch"
+                                SizeChanged="ObserverAdvantageTrack_SizeChanged">
+                                <Grid>
+                                    <Border
+                                        x:Name="ObserverAdvantageFill"
+                                        Background="{StaticResource ChessPurpleBrush}"
+                                        VerticalAlignment="Top"
+                                        CornerRadius="1.5" />
+                                    <Border
+                                        x:Name="ObserverAdvantageWhiteFill"
+                                        Background="White"
+                                        VerticalAlignment="Bottom"
+                                        CornerRadius="1.5" />
+                                    <Border
+                                        Height="1"
+                                        Background="{StaticResource ChessAdvantageCenterBrush}"
+                                        VerticalAlignment="Center" />
+                                </Grid>
+                            </Border>
+                            <Viewbox
+                                Grid.Column="1"
+                                Stretch="Uniform"
+                                StretchDirection="Both"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Stretch">
+                                <Border
+                                    Width="650"
+                                    Height="650"
+                                    CornerRadius="8"
+                                    BorderThickness="1"
+                                    Padding="4">
+                                    <ItemsRepeater
+                                        ItemsSource="{Binding ObserverSquares}"
+                                        Width="640"
+                                        Height="640">
+                                        <ItemsRepeater.Layout>
+                                            <UniformGridLayout
+                                                MinItemWidth="80"
+                                                MinItemHeight="80"
+                                                MaximumRowsOrColumns="8"
+                                                Orientation="Horizontal" />
+                                        </ItemsRepeater.Layout>
+                                        <ItemsRepeater.ItemTemplate>
+                                            <DataTemplate
+                                                x:DataType="vm:BoardSquareViewModel">
+                                                <Grid
+                                                    Width="80"
+                                                    Height="80"
+                                                    Background="{x:Bind Background, Mode=OneWay}">
+                                                    <TextBlock
+                                                        Text="{x:Bind PieceGlyph, Mode=OneWay}"
+                                                        Foreground="{x:Bind PieceBrush, Mode=OneWay}"
+                                                        FontFamily="Segoe UI Symbol"
+                                                        FontSize="56"
+                                                        HorizontalAlignment="Center"
+                                                        VerticalAlignment="Center" />
+                                                    <TextBlock
+                                                        Text="{x:Bind RankLabel, Mode=OneWay}"
+                                                        FontSize="12"
+                                                        FontWeight="Bold"
+                                                        Foreground="White"
+                                                        Margin="5,3,0,0"
+                                                        HorizontalAlignment="Left"
+                                                        VerticalAlignment="Top" />
+                                                    <TextBlock
+                                                        Text="{x:Bind FileLabel, Mode=OneWay}"
+                                                        FontSize="12"
+                                                        FontWeight="Bold"
+                                                        Foreground="White"
+                                                        Margin="0,0,5,3"
+                                                        HorizontalAlignment="Right"
+                                                        VerticalAlignment="Bottom" />
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsRepeater.ItemTemplate>
+                                    </ItemsRepeater>
+                                </Border>
+                            </Viewbox>
+                        </Grid>
+                        <Grid
+                            Grid.Row="2"
+                            Margin="6,8,6,0"
+                            ColumnSpacing="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition
+                                    Width="38" />
+                                <ColumnDefinition
+                                    Width="*" />
+                                <ColumnDefinition
+                                    Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Border
+                                Style="{StaticResource ChessPlayerAvatarStyle}">
+                                <FontIcon
+                                    Glyph=""
+                                    FontSize="18" />
+                            </Border>
+                            <StackPanel
+                                Grid.Column="1"
+                                VerticalAlignment="Center">
+                                <TextBlock
+                                    Text="{Binding ObserverWhiteName}"
+                                    FontWeight="SemiBold" />
+                                <StackPanel
+                                    Orientation="Horizontal"
+                                    Spacing="8">
+                                    <TextBlock
+                                        Text="Zdobyte:"
+                                        FontSize="11"
+                                        Opacity="0.58"
+                                        VerticalAlignment="Center" />
+                                    <TextBlock
+                                        Text="{Binding ObserverWhiteCapturedPieces}"
+                                        FontFamily="Segoe UI Symbol"
+                                        FontSize="16"
+                                        Foreground="{StaticResource ChessPrimaryTextBrush}"
+                                        Opacity="0.95" />
+                                    <TextBlock
+                                        Text="{Binding ObserverWhiteAdvantageText}"
+                                        FontSize="12"
+                                        FontWeight="SemiBold"
+                                        VerticalAlignment="Center" />
+                                </StackPanel>
+                            </StackPanel>
+                            <TextBlock
+                                Grid.Column="2"
+                                Text="{Binding ObserverWhiteClock}"
+                                FontFamily="Cascadia Mono"
+                                FontSize="17"
+                                FontWeight="SemiBold"
+                                VerticalAlignment="Center"
+                                Margin="16,0,0,0" />
+                        </Grid>
+                    </Grid>
+                    <Border
+                        Grid.Column="1"
+                        Background="{StaticResource ChessPanelBrush}"
+                        BorderBrush="{StaticResource ChessBorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="12"
+                        RequestedTheme="Dark">
+                        <Grid
+                            Padding="20"
+                            RowSpacing="12">
+                            <Grid.RowDefinitions>
+                                <RowDefinition
+                                    Height="Auto" />
+                                <RowDefinition
+                                    Height="Auto" />
+                                <RowDefinition
+                                    Height="Auto" />
+                                <RowDefinition
+                                    Height="*" />
+                                <RowDefinition
+                                    Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <StackPanel
+                                Spacing="10">
+                                <TextBlock
+                                    Text="Informacje o partii"
+                                    FontSize="20"
+                                    FontWeight="SemiBold" />
+                                <Border
+                                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                    BorderBrush="{StaticResource ChessBorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Padding="10">
+                                    <Grid
+                                        ColumnSpacing="12">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition
+                                                Width="*" />
+                                            <ColumnDefinition
+                                                Width="*" />
+                                            <ColumnDefinition
+                                                Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock
+                                                Text="Białe"
+                                                FontSize="11"
+                                                Opacity="0.55" />
+                                            <TextBlock
+                                                Text="{Binding ObserverWhiteName}"
+                                                FontWeight="SemiBold"
+                                                TextTrimming="CharacterEllipsis" />
+                                            <StackPanel
+                                                Orientation="Horizontal"
+                                                Spacing="6">
+                                                <TextBlock
+                                                    Text="Zdobyte:"
+                                                    FontSize="10"
+                                                    Opacity="0.55"
+                                                    VerticalAlignment="Center" />
+                                                <TextBlock
+                                                    Text="{Binding ObserverWhiteAdvantageText}"
+                                                    FontFamily="Segoe UI Symbol"
+                                                    Foreground="{StaticResource ChessPrimaryTextBrush}"
+                                                    FontSize="10" />
+                                            </StackPanel>
+                                        </StackPanel>
+                                        <StackPanel
+                                            Grid.Column="1">
+                                            <TextBlock
+                                                Text="Czarne"
+                                                FontSize="11"
+                                                Opacity="0.55" />
+                                            <TextBlock
+                                                Text="{Binding ObserverBlackName}"
+                                                FontWeight="SemiBold"
+                                                TextTrimming="CharacterEllipsis" />
+                                            <StackPanel
+                                                Orientation="Horizontal"
+                                                Spacing="6">
+                                                <TextBlock
+                                                    Text="Zdobyte:"
+                                                    FontSize="10"
+                                                    Opacity="0.55"
+                                                    VerticalAlignment="Center" />
+                                                <TextBlock
+                                                    Text="{Binding ObserverBlackAdvantageText}"
+                                                    FontFamily="Segoe UI Symbol"
+                                                    Foreground="{StaticResource ChessPrimaryTextBrush}"
+                                                    FontSize="10" />
+                                            </StackPanel>
+                                        </StackPanel>
+                                        <StackPanel
+                                            Grid.Column="2"
+                                            HorizontalAlignment="Right">
+                                            <TextBlock
+                                                Text="Wynik"
+                                                FontSize="11"
+                                                Opacity="0.55"
+                                                HorizontalAlignment="Right" />
+                                            <TextBlock
+                                                Text="{Binding ObserverResult}"
+                                                FontSize="17"
+                                                FontWeight="SemiBold"
+                                                HorizontalAlignment="Right" />
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                                <Grid
+                                    ColumnSpacing="16">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition
+                                            Width="*" />
+                                        <ColumnDefinition
+                                            Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock
+                                            Text="Kontrola czasu"
+                                            FontSize="11"
+                                            Opacity="0.55" />
+                                        <TextBlock
+                                            Text="{Binding ObserverFormatText}"
+                                            FontWeight="SemiBold" />
+                                    </StackPanel>
+                                    <StackPanel
+                                        Grid.Column="1">
+                                        <TextBlock
+                                            Text="Czas"
+                                            FontSize="11"
+                                            Opacity="0.55" />
+                                        <TextBlock
+                                            Text="{Binding ObserverDurationText}"
+                                            FontWeight="SemiBold" />
+                                    </StackPanel>
+                                </Grid>
+                            </StackPanel>
+                            <Grid
+                                Grid.Row="1"
+                                ColumnSpacing="10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition
+                                        Width="*" />
+                                    <ColumnDefinition
+                                        Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Button
+                                    Content="{Binding ObserverPrimaryButtonText}"
+                                    Style="{StaticResource AccentButtonStyle}"
+                                    Click="ToggleObservedMatch_Click"
+                                    IsEnabled="{Binding CanControlObserverMatch}"
+                                    HorizontalAlignment="Stretch" />
+                                <Button
+                                    Grid.Column="1"
+                                    Content="Zakończ partię"
+                                    Click="StopObservedMatch_Click"
+                                    IsEnabled="{Binding CanControlObserverMatch}"
+                                    HorizontalAlignment="Stretch"
+                                    Style="{StaticResource ChessDangerButtonStyle}" />
+                            </Grid>
+                            <Border
+                                Grid.Row="2"
+                                BorderThickness="0,1,0,0"
+                                BorderBrush="{StaticResource ChessBorderBrush}"
+                                Padding="0,12,0,0">
+                                <TextBlock
+                                    Text="Ruchy"
+                                    FontSize="18"
+                                    FontWeight="SemiBold" />
+                            </Border>
+                            <ListView
+                                Grid.Row="3"
+                                ItemsSource="{Binding ObserverMoveLog}"
+                                SelectionChanged="ObserverMoveLog_SelectionChanged">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate
+                                        x:DataType="vm:MoveLogEntryViewModel">
+                                        <Grid
+                                            Padding="8">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition
+                                                    Width="45" />
+                                                <ColumnDefinition
+                                                    Width="*" />
+                                                <ColumnDefinition
+                                                    Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock
+                                                Text="{x:Bind Number}" />
+                                            <TextBlock
+                                                Grid.Column="1"
+                                                Text="{x:Bind WhiteMove}" />
+                                            <TextBlock
+                                                Grid.Column="2"
+                                                Text="{x:Bind BlackMove}" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                            <Grid
+                                Grid.Row="4"
+                                ColumnSpacing="8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition
+                                        Width="Auto" />
+                                    <ColumnDefinition
+                                        Width="*" />
+                                    <ColumnDefinition
+                                        Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Button
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    Content=""
+                                    FontFamily="Segoe Fluent Icons"
+                                    Click="ObserverPrevious_Click"
+                                    IsEnabled="{Binding CanBrowsePreviousObserverPosition}">
+                                    <Button.Resources>
+                                        <SolidColorBrush
+                                            x:Key="ButtonBackgroundPointerOver"
+                                            Color="Transparent" />
+                                        <SolidColorBrush
+                                            x:Key="ButtonBackgroundPressed"
+                                            Color="Transparent" />
+                                        <SolidColorBrush
+                                            x:Key="ButtonForegroundPointerOver"
+                                            Color="{StaticResource ChessIconPointerOverColor}" />
+                                    </Button.Resources>
+                                </Button>
+                                <TextBlock
+                                    Grid.Column="1"
+                                    Text="{Binding ObserverPositionText}"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center" />
+                                <Button
+                                    Grid.Column="2"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    Content=""
+                                    FontFamily="Segoe Fluent Icons"
+                                    Click="ObserverNext_Click"
+                                    IsEnabled="{Binding CanBrowseNextObserverPosition}">
+                                    <Button.Resources>
+                                        <SolidColorBrush
+                                            x:Key="ButtonBackgroundPointerOver"
+                                            Color="Transparent" />
+                                        <SolidColorBrush
+                                            x:Key="ButtonBackgroundPressed"
+                                            Color="Transparent" />
+                                        <SolidColorBrush
+                                            x:Key="ButtonForegroundPointerOver"
+                                            Color="{StaticResource ChessIconPointerOverColor}" />
+                                    </Button.Resources>
+                                </Button>
+                            </Grid>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Grid>
+            <!-- Ustawienia aplikacji -->
+            <Grid
+                x:Name="SettingsView"
+                Visibility="Collapsed"
+                Padding="24"
+                RowSpacing="18"
+                DataContext="{x:Bind Hub}">
+                <Grid.RowDefinitions>
+                    <RowDefinition
+                        Height="Auto" />
+                    <RowDefinition
+                        Height="Auto" />
+                    <RowDefinition
+                        Height="*" />
+                </Grid.RowDefinitions>
+                <StackPanel>
+                    <TextBlock
+                        Text="Ustawienia"
+                        FontSize="28"
+                        FontWeight="SemiBold" />
+                    <TextBlock
+                        Text="Język i informacje o aplikacji"
+                        Opacity="0.65" />
+                </StackPanel>
+                <Border
+                    Grid.Row="1"
+                    Width="520"
+                    HorizontalAlignment="Left"
+                    Background="{StaticResource ChessPanelBrush}"
+                    BorderBrush="{StaticResource ChessBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="12"
+                    Padding="20"
+                    RequestedTheme="Dark">
+                    <StackPanel
+                        Spacing="18">
+                        <ComboBox
+                            Header="Język aplikacji"
+                            ItemsSource="{Binding AvailableLanguages}"
+                            SelectedIndex="{Binding SelectedLanguageIndex, Mode=TwoWay}"
+                            HorizontalAlignment="Stretch" />
+                        <Grid>
+                            <StackPanel>
+                                <TextBlock
+                                    Text="Wersja API"
+                                    FontWeight="SemiBold" />
+                                <TextBlock
+                                    Text="Środowisko uruchomieniowe"
+                                    FontSize="12"
+                                    Opacity="0.6" />
+                            </StackPanel>
+                            <TextBlock
+                                Text="{Binding ApiVersion}"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Center"
+                                FontFamily="Cascadia Mono" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </Grid>
+            <!-- Zapisane partie -->
+            <Grid
+                x:Name="SavedGamesView"
+                Visibility="Collapsed"
+                Padding="24"
+                RowSpacing="16"
+                DataContext="{x:Bind Hub}">
+                <Grid.RowDefinitions>
+                    <RowDefinition
+                        Height="Auto" />
+                    <RowDefinition
+                        Height="*" />
+                </Grid.RowDefinitions>
+                <StackPanel>
+                    <TextBlock
+                        Text="Zapisane partie silników"
+                        FontSize="28"
+                        FontWeight="SemiBold" />
+                    <TextBlock
+                        Text="PGN i analiza zapisane lokalnie"
+                        Opacity="0.65" />
+                </StackPanel>
+                <Grid
+                    Grid.Row="1"
+                    ColumnSpacing="18">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition
+                            Width="420" />
+                        <ColumnDefinition
+                            Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <ListView
+                        ItemsSource="{Binding SavedGames}"
+                        SelectedItem="{Binding SelectedSavedGame, Mode=TwoWay}"
+                        SelectionMode="Single">
+                        <ListView.ItemTemplate>
+                            <DataTemplate
+                                x:DataType="models:SavedEngineGame" xmlns:models="using:ChessDesktopApp.Models">
+                                <Border
+                                    Padding="8,5">
+                                    <Border.ContextFlyout>
+                                        <MenuFlyout>
+                                            <MenuFlyoutItem
+                                                Text="Usuń zapisaną partię"
+                                                Tag="{x:Bind}"
+                                                Click="DeleteSavedGameFromMenu_Click">
+                                                <MenuFlyoutItem.Icon>
+                                                    <FontIcon
+                                                        Glyph="" />
+                                                </MenuFlyoutItem.Icon>
+                                            </MenuFlyoutItem>
+                                        </MenuFlyout>
+                                    </Border.ContextFlyout>
+                                    <StackPanel>
+                                        <TextBlock
+                                            Text="{x:Bind PairingText}"
+                                            FontWeight="SemiBold" />
+                                        <StackPanel
+                                            Orientation="Horizontal"
+                                            Spacing="8">
+                                            <TextBlock
+                                                Text="{x:Bind Result}" />
+                                            <TextBlock
+                                                Text="{x:Bind ResultReason}"
+                                                Opacity="0.65" />
+                                        </StackPanel>
+                                        <TextBlock
+                                            Text="{x:Bind DateText}"
+                                            FontSize="12"
+                                            Opacity="0.55" />
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                    <Border
+                        Grid.Column="1"
+                        Background="{StaticResource ChessPanelBrush}"
+                        BorderBrush="{StaticResource ChessBorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="12"
+                        Padding="18"
+                        RequestedTheme="Dark">
+                        <Grid
+                            RowSpacing="10">
+                            <Grid.RowDefinitions>
+                                <RowDefinition
+                                    Height="Auto" />
+                                <RowDefinition
+                                    Height="*" />
+                            </Grid.RowDefinitions>
+                            <Grid
+                                ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition
+                                        Width="*" />
+                                    <ColumnDefinition
+                                        Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock
+                                    Text="{Binding SelectedGameSummary}"
+                                    FontSize="18"
+                                    FontWeight="SemiBold"
+                                    VerticalAlignment="Center" />
+                                <StackPanel
+                                    Grid.Column="1"
+                                    Orientation="Horizontal"
+                                    Spacing="8">
+                                    <Button
+                                        Content="Usuń"
+                                        Click="DeleteSelectedSavedGame_Click"
+                                        IsEnabled="{Binding HasSelectedSavedGame}"
+                                        Style="{StaticResource ChessDangerButtonStyle}" />
+                                    <Button
+                                        Content="Otwórz na planszy"
+                                        Click="OpenSavedGameOnBoard_Click"
+                                        IsEnabled="{Binding HasSelectedSavedGame}"
+                                        Style="{StaticResource AccentButtonStyle}" />
+                                </StackPanel>
+                            </Grid>
+                            <Border
+                                Grid.Row="1"
+                                Background="{StaticResource ChessPanelInsetBrush}"
+                                BorderBrush="{StaticResource ChessBorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="9"
+                                Padding="14">
+                                <ScrollViewer
+                                    VerticalScrollBarVisibility="Auto"
+                                    HorizontalScrollBarVisibility="Disabled">
+                                    <TextBlock
+                                        Text="{Binding SelectedGamePgn}"
+                                        TextWrapping="Wrap"
+                                        FontFamily="Cascadia Mono"
+                                        FontSize="13"
+                                        IsTextSelectionEnabled="True" />
+                                </ScrollViewer>
+                            </Border>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Grid>
+            <!-- Historia i statystyki turniejów -->
+            <Grid
+                x:Name="TournamentHistoryView"
+                Visibility="Collapsed"
+                Padding="24"
+                RowSpacing="16"
+                DataContext="{x:Bind Hub}">
+                <Grid.RowDefinitions>
+                    <RowDefinition
+                        Height="Auto" />
+                    <RowDefinition
+                        Height="Auto" />
+                    <RowDefinition
+                        Height="*" />
+                </Grid.RowDefinitions>
+                <Grid>
+                    <StackPanel>
+                        <TextBlock
+                            Text="Historia turniejów"
+                            FontSize="28"
+                            FontWeight="SemiBold" />
+                        <TextBlock
+                            Text="Lokalnie zapisane turnieje — wybierz, aby otworzyć pełne dane"
+                            Opacity="0.65" />
+                    </StackPanel>
+                    <StackPanel
+                        Orientation="Horizontal"
+                        Spacing="8"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center">
+                        <Button
+                            Content="Nowy turniej"
+                            Click="NewTournament_Click"
+                            IsEnabled="{Binding CanCreateNewTournament}"
+                            Style="{StaticResource AccentButtonStyle}" />
+                    </StackPanel>
+                </Grid>
+                <TextBox
+                    Grid.Row="1"
+                    PlaceholderText="Szukaj po nazwie turnieju lub silnika"
+                    Text="{Binding TournamentSearchText, Mode=TwoWay}"
+                    MinWidth="300"
+                    MaxWidth="560"
+                    HorizontalAlignment="Left" />
+                <ListView
+                    Grid.Row="2"
+                    ItemsSource="{Binding TournamentHistory}"
+                    SelectedItem="{Binding SelectedTournament, Mode=TwoWay}"
+                    IsItemClickEnabled="True"
+                    ItemClick="TournamentHistory_ItemClick"
+                    ItemContainerStyle="{StaticResource TournamentCardListViewItemStyle}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate
+                            x:DataType="models:EngineTournament" xmlns:models="using:ChessDesktopApp.Models">
+                            <Grid
+                                ColumnSpacing="18">
+                                <Grid.ContextFlyout>
+                                    <MenuFlyout>
+                                        <MenuFlyoutItem
+                                            Text="Usuń turniej"
+                                            Tag="{x:Bind}"
+                                            Click="DeleteTournamentFromMenu_Click">
+                                            <MenuFlyoutItem.Icon>
+                                                <FontIcon
+                                                    Glyph="" />
+                                            </MenuFlyoutItem.Icon>
+                                        </MenuFlyoutItem>
+                                    </MenuFlyout>
+                                </Grid.ContextFlyout>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition
+                                        Width="2*" />
+                                    <ColumnDefinition
+                                        Width="2*" />
+                                    <ColumnDefinition
+                                        Width="2*" />
+                                    <ColumnDefinition
+                                        Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock
+                                        Text="{x:Bind Name}"
+                                        FontWeight="SemiBold"
+                                        FontSize="16" />
+                                    <TextBlock
+                                        Text="{x:Bind StatusText}"
+                                        FontSize="12"
+                                        Opacity="0.65" />
+                                </StackPanel>
+                                <StackPanel
+                                    Grid.Column="1">
+                                    <TextBlock
+                                        Text="Start — koniec"
+                                        FontSize="11"
+                                        Opacity="0.55" />
+                                    <TextBlock
+                                        Text="{x:Bind DateRangeText}" />
+                                </StackPanel>
+                                <StackPanel
+                                    Grid.Column="2">
+                                    <TextBlock
+                                        Text="Format"
+                                        FontSize="11"
+                                        Opacity="0.55" />
+                                    <TextBlock
+                                        Text="{x:Bind SummaryText}" />
+                                </StackPanel>
+                                <StackPanel
+                                    Grid.Column="3"
+                                    HorizontalAlignment="Right">
+                                    <TextBlock
+                                        Text="Zwycięzca"
+                                        FontSize="11"
+                                        Opacity="0.55"
+                                        HorizontalAlignment="Right" />
+                                    <TextBlock
+                                        Text="{x:Bind DisplayWinnerName}"
+                                        FontWeight="SemiBold"
+                                        HorizontalAlignment="Right" />
+                                </StackPanel>
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </Grid>
+            <!-- Konfiguracja silników -->
+            <Grid
+                x:Name="EnginesView"
+                Visibility="Collapsed"
+                Padding="24"
+                RowSpacing="16"
+                DataContext="{x:Bind Hub}">
+                <Grid.RowDefinitions>
+                    <RowDefinition
+                        Height="Auto" />
+                    <RowDefinition
+                        Height="*" />
+                </Grid.RowDefinitions>
+                <Grid>
+                    <StackPanel>
+                        <TextBlock
+                            Text="Silniki UCI"
+                            FontSize="28"
+                            FontWeight="SemiBold" />
+                        <TextBlock
+                            Text="Lokalne procesy — bez połączenia z internetem"
+                            Opacity="0.65" />
+                    </StackPanel>
+                    <ProgressRing
+                        IsActive="{Binding IsBusy}"
+                        HorizontalAlignment="Right"
+                        Width="28"
+                        Height="28" />
+                </Grid>
+                <Grid
+                    Grid.Row="1"
+                    ColumnSpacing="18">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition
+                            Width="4*" />
+                        <ColumnDefinition
+                            Width="5*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid
+                        RowSpacing="10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition
+                                Height="Auto" />
+                            <RowDefinition
+                                Height="*" />
+                            <RowDefinition
+                                Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid
+                            ColumnSpacing="8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition
+                                    Width="*" />
+                                <ColumnDefinition
+                                    Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock
+                                Text="Wykryte silniki"
+                                FontSize="18"
+                                FontWeight="SemiBold" />
+                            <Button
+                                Grid.Column="1"
+                                Content="Dodaj plik EXE"
+                                Style="{StaticResource AccentButtonStyle}"
+                                Click="AddEngine_Click" />
+                        </Grid>
+                        <ListView
+                            Grid.Row="1"
+                            ItemsSource="{Binding Engines}"
+                            SelectedItem="{Binding SelectedManagedEngine, Mode=TwoWay}">
+                            <ListView.ItemTemplate>
+                                <DataTemplate
+                                    x:DataType="models:EngineDefinition" xmlns:models="using:ChessDesktopApp.Models">
+                                    <StackPanel
+                                        Padding="8,5">
+                                        <TextBlock
+                                            Text="{x:Bind Name}"
+                                            FontWeight="SemiBold" />
+                                        <TextBlock
+                                            Text="{x:Bind Status}"
+                                            FontSize="12" />
+                                        <TextBlock
+                                            Text="{x:Bind DisplayPath}"
+                                            TextTrimming="CharacterEllipsis"
+                                            FontSize="11"
+                                            Opacity="0.55" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                        <Grid
+                            Grid.Row="2"
+                            ColumnSpacing="8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition
+                                    Width="*" />
+                                <ColumnDefinition
+                                    Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Button
+                                Content="Testuj UCI"
+                                Click="ValidateEngine_Click"
+                                HorizontalAlignment="Stretch" />
+                            <Button
+                                Grid.Column="1"
+                                Content="Usuń z konfiguracji"
+                                Click="RemoveEngine_Click"
+                                HorizontalAlignment="Stretch" />
+                        </Grid>
+                    </Grid>
+                    <ScrollViewer
+                        Grid.Column="1">
+                        <StackPanel
+                            Spacing="12">
+                            <InfoBar
+                                IsOpen="{Binding HasError}"
+                                Severity="Error"
+                                IsClosable="False"
+                                Message="{Binding ErrorText}" />
+                            <TextBlock
+                                Text="Instalacja silników"
+                                FontSize="20"
+                                FontWeight="SemiBold" />
+                            <TextBlock
+                                Text="Pobierz silnik z oficjalnej strony projektu, rozpakuj go, a następnie wybierz właściwy plik .exe przyciskiem „Dodaj plik EXE”. Pliki możesz trzymać w dowolnym miejscu lub w przygotowanych katalogach aplikacji:"
+                                TextWrapping="Wrap" />
+                            <TextBlock
+                                Text="{Binding EnginesPath}"
+                                FontFamily="Cascadia Mono"
+                                TextWrapping="Wrap"
+                                Opacity="0.75" />
+                            <Border
+                                Background="{StaticResource ChessPanelBrush}"
+                                BorderBrush="{StaticResource ChessBorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="10"
+                                Padding="14"
+                                RequestedTheme="Dark">
+                                <StackPanel
+                                    Spacing="7">
+                                    <TextBlock
+                                        Text="Obsługiwane przez wspólny standard UCI"
+                                        FontWeight="SemiBold" />
+                                    <TextBlock
+                                        Text="Lc0 · Berserk · Obsidian · Caissa · Alexandria · Koivisto · RubiChess · Ethereal Standard · Smallbrain"
+                                        TextWrapping="Wrap" />
+                                    <TextBlock
+                                        Text="Lc0: umieść plik sieci .pb.gz w katalogu silnika albo skonfiguruj ścieżkę weights zgodnie z wydaniem Lc0. Jeśli sieć nie zostanie znaleziona, test UCI pokaże komunikat diagnostyczny."
+                                        TextWrapping="Wrap"
+                                        Opacity="0.72" />
+                                </StackPanel>
+                            </Border>
+                            <TextBlock
+                                Text="Dane lokalne"
+                                FontSize="18"
+                                FontWeight="SemiBold" />
+                            <TextBlock
+                                Text="Konfiguracja silników, PGN-y i turnieje są przechowywane tutaj:" />
+                            <TextBlock
+                                Text="{Binding StoragePath}"
+                                FontFamily="Cascadia Mono"
+                                TextWrapping="Wrap"
+                                Opacity="0.75" />
+                            <TextBlock
+                                Text="Usunięcie silnika w aplikacji usuwa tylko wpis konfiguracyjny — plik wykonywalny pozostaje na dysku."
+                                TextWrapping="Wrap"
+                                Opacity="0.65" />
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+            </Grid>
+        </Grid>
+    </NavigationView>
+</Window>
